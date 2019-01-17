@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+
+  <meta charset="utf-8" />
+
+  
+  <title>Ultron</title>
+
+  
+  
+  <link href="//cdn.jsdelivr.net" rel="dns-prefetch">
+  <link href="//cdnjs.cloudflare.com" rel="dns-prefetch">
+  <link href="//at.alicdn.com" rel="dns-prefetch">
+  <link href="//fonts.googleapis.com" rel="dns-prefetch">
+  <link href="//fonts.gstatic.com" rel="dns-prefetch">
+  
+  
+  
+  
+  
+
+  
+
+  
+  
+  <meta name="description" content="Ultron使用手册 [TOC]
+1. 开发背景 在一次与其他压测工具比较的过程中（https://phabricator.wosai-inc.com/T189），我无意发现之前使用的Locust有致命的性能问题：对于极快的GET接口，其产生的压力比AB、JMeter等少了几个量级，再加上我本身不满因Locust使用Python开发只能利用单核而导致经常需要多实例部署的情况，我决定利用Golang原生的高并发能力来重写一个压测工具。
+我希望它满足以下特性：
+ 单实力高并发能力 支持分布式部署 支持接入多种协议 脚本层面借鉴Locust的方式，高度的定制化能力  但与成熟的压测工具相比，Ultron存在以下明显的劣势：
+ 缺少GUI界面，门槛较高，需要一定的Golang编程能力 更像一个“压测执行框架”，而不是工具 目前仅接入http协议，插件也极少 虽然开源（https://github.com/jacexh/ultron），但未做推广，使用者极少  2 主要对象介绍 2.1 Attacker type Attacker interface { Name() string Fire() error }  Attacker是请求行为、事务的interface，结构体HTTPAttacker是该interface的一个实现，其作用是使用内置net/http包来处理http请求
+其中Name()方法返回了请求行为的名称，在http压测中，可以理解为接口名
+Fire()方法是请求的行为，当结果返回为nil即没有错误时，则认为请求成功，反之视为请求失败，并记录具体的错误信息
+2.2 Runner type Runner interface { WithConfig(*RunnerConfig) WithTask(*Task) GetConfig() *RunnerConfig GetStatus() Status Start() Done() }  测试执行器，目前具体的实现有localRunner、masterRunner、slaveRunner，分别用于单机压测、分布式压测的控制台、分布式压测的节点
+2.3 RunnerConfig type RunnerConfig struct { Duration time.Duration `json:&amp;quot;duration&amp;quot;` Requests uint64 `json:&amp;quot;requests&amp;quot;` Concurrence int `json:&amp;quot;concurrence&amp;quot;` HatchRate int `json:&amp;quot;hatch_rate&amp;quot;` MinWait time.">
+
+  
+  
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@jacexh">
+    <meta name="twitter:title" content="Ultron">
+    <meta name="twitter:description" content="Ultron使用手册 [TOC]
+1. 开发背景 在一次与其他压测工具比较的过程中（https://phabricator.wosai-inc.com/T189），我无意发现之前使用的Locust有致命的性能问题：对于极快的GET接口，其产生的压力比AB、JMeter等少了几个量级，再加上我本身不满因Locust使用Python开发只能利用单核而导致经常需要多实例部署的情况，我决定利用Golang原生的高并发能力来重写一个压测工具。
+我希望它满足以下特性：
+ 单实力高并发能力 支持分布式部署 支持接入多种协议 脚本层面借鉴Locust的方式，高度的定制化能力  但与成熟的压测工具相比，Ultron存在以下明显的劣势：
+ 缺少GUI界面，门槛较高，需要一定的Golang编程能力 更像一个“压测执行框架”，而不是工具 目前仅接入http协议，插件也极少 虽然开源（https://github.com/jacexh/ultron），但未做推广，使用者极少  2 主要对象介绍 2.1 Attacker type Attacker interface { Name() string Fire() error }  Attacker是请求行为、事务的interface，结构体HTTPAttacker是该interface的一个实现，其作用是使用内置net/http包来处理http请求
+其中Name()方法返回了请求行为的名称，在http压测中，可以理解为接口名
+Fire()方法是请求的行为，当结果返回为nil即没有错误时，则认为请求成功，反之视为请求失败，并记录具体的错误信息
+2.2 Runner type Runner interface { WithConfig(*RunnerConfig) WithTask(*Task) GetConfig() *RunnerConfig GetStatus() Status Start() Done() }  测试执行器，目前具体的实现有localRunner、masterRunner、slaveRunner，分别用于单机压测、分布式压测的控制台、分布式压测的节点
+2.3 RunnerConfig type RunnerConfig struct { Duration time.Duration `json:&amp;quot;duration&amp;quot;` Requests uint64 `json:&amp;quot;requests&amp;quot;` Concurrence int `json:&amp;quot;concurrence&amp;quot;` HatchRate int `json:&amp;quot;hatch_rate&amp;quot;` MinWait time.">
+    <meta name="twitter:image" content="/images/avatar.png">
+  
+
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Ultron">
+  <meta property="og:description" content="Ultron使用手册 [TOC]
+1. 开发背景 在一次与其他压测工具比较的过程中（https://phabricator.wosai-inc.com/T189），我无意发现之前使用的Locust有致命的性能问题：对于极快的GET接口，其产生的压力比AB、JMeter等少了几个量级，再加上我本身不满因Locust使用Python开发只能利用单核而导致经常需要多实例部署的情况，我决定利用Golang原生的高并发能力来重写一个压测工具。
+我希望它满足以下特性：
+ 单实力高并发能力 支持分布式部署 支持接入多种协议 脚本层面借鉴Locust的方式，高度的定制化能力  但与成熟的压测工具相比，Ultron存在以下明显的劣势：
+ 缺少GUI界面，门槛较高，需要一定的Golang编程能力 更像一个“压测执行框架”，而不是工具 目前仅接入http协议，插件也极少 虽然开源（https://github.com/jacexh/ultron），但未做推广，使用者极少  2 主要对象介绍 2.1 Attacker type Attacker interface { Name() string Fire() error }  Attacker是请求行为、事务的interface，结构体HTTPAttacker是该interface的一个实现，其作用是使用内置net/http包来处理http请求
+其中Name()方法返回了请求行为的名称，在http压测中，可以理解为接口名
+Fire()方法是请求的行为，当结果返回为nil即没有错误时，则认为请求成功，反之视为请求失败，并记录具体的错误信息
+2.2 Runner type Runner interface { WithConfig(*RunnerConfig) WithTask(*Task) GetConfig() *RunnerConfig GetStatus() Status Start() Done() }  测试执行器，目前具体的实现有localRunner、masterRunner、slaveRunner，分别用于单机压测、分布式压测的控制台、分布式压测的节点
+2.3 RunnerConfig type RunnerConfig struct { Duration time.Duration `json:&amp;quot;duration&amp;quot;` Requests uint64 `json:&amp;quot;requests&amp;quot;` Concurrence int `json:&amp;quot;concurrence&amp;quot;` HatchRate int `json:&amp;quot;hatch_rate&amp;quot;` MinWait time.">
+  <meta property="og:url" content="http://blog.xuh.me/post/ultron/">
+  <meta property="og:image" content="/images/avatar.png">
+
+
+
+
+<meta name="generator" content="Hugo 0.53">
+
+
+<link rel="canonical" href="http://blog.xuh.me/post/ultron/">
+
+<meta name="renderer" content="webkit">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="format-detection" content="telephone=no,email=no,adress=no">
+<meta http-equiv="Cache-Control" content="no-transform">
+
+
+<meta name="robots" content="index,follow">
+<meta name="referrer" content="origin-when-cross-origin">
+
+
+
+
+
+
+
+<meta name="theme-color" content="#02b875">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Jace&#39;s Blog">
+<meta name="msapplication-tooltip" content="Jace&#39;s Blog">
+<meta name='msapplication-navbutton-color' content="#02b875">
+<meta name="msapplication-TileColor" content="#02b875">
+<meta name="msapplication-TileImage" content="/icons/icon-144x144.png">
+<link rel="icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png">
+<link rel="icon" sizes="192x192" href="/icons/icon-192x192.png">
+<link rel="apple-touch-icon" href="/icons/icon-152x152.png">
+<link rel="manifest" href="/manifest.json">
+
+
+<link rel="preload" href="/styles/main.min.css" as="style">
+<link rel="preload" href="https://fonts.googleapis.com/css?family=Lobster" as="style">
+<link rel="preload" href="/images/avatar.png" as="image">
+<link rel="preload" href="/images/grey-prism.svg" as="image">
+
+
+<style>
+  body {
+    background: rgb(244, 243, 241) url('/images/grey-prism.svg') repeat fixed;
+  }
+</style>
+<link rel="stylesheet" href="/styles/main.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lobster">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.2/dist/medium-zoom.min.js"></script>
+
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/video.js@7.3.0/dist/video-js.min.css">
+
+
+
+  
+  
+<!--[if lte IE 8]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/videojs-ie8@1.1.2/dist/videojs-ie8.min.js"></script>
+<![endif]-->
+
+<!--[if lte IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/eligrey-classlist-js-polyfill@1.2.20180112/classList.min.js"></script>
+<![endif]-->
+
+
+</head>
+  <body>
+    
+    <div class="suspension">
+      <a role="button" aria-label="Go to top" title="Go to top" class="to-top is-hide"><span class="icon icon-up" aria-hidden="true"></span></a>
+      
+        
+      
+    </div>
+    
+    
+  <header class="site-header">
+  <img class="avatar" src="/images/avatar.png" alt="Avatar">
+  
+  <h2 class="title">Jace&#39;s Blog</h2>
+  
+  <p class="subtitle"></p>
+  <button class="menu-toggle" type="button" aria-label="Main Menu" aria-expanded="false" tab-index="0">
+    <span class="icon icon-menu" aria-hidden="true"></span>
+  </button>
+
+  <nav class="site-menu collapsed">
+    <h2 class="offscreen">Main Menu</h2>
+    <ul class="menu-list">
+      
+      
+      
+      
+        <li class="menu-item
+          
+          
+          ">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="menu-item
+          
+          
+          ">
+          <a href="https://github.com/jacexh">Works</a>
+        </li>
+      
+        <li class="menu-item
+          
+          
+          ">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+    </ul>
+  </nav>
+  <nav class="social-menu collapsed">
+    <h2 class="offscreen">Social Networks</h2>
+    <ul class="social-list"><li class="social-item">
+          <a href="mailto:jace.xh@gmail.com" title="Email" aria-label="Email">
+            <span class="icon icon-email" aria-hidden="true"></span>
+          </a>
+        </li><li class="social-item">
+          <a href="//github.com/jacexh" title="GitHub" aria-label="GitHub">
+            <span class="icon icon-github" aria-hidden="true"></span>
+          </a>
+        </li><li class="social-item">
+          <a href="//twitter.com/jacexh" title="Twitter" aria-label="Twitter">
+            <span class="icon icon-twitter" aria-hidden="true"></span>
+          </a>
+        </li></ul>
+  </nav>
+</header>
+
+  <section class="main post-detail">
+    <header class="post-header">
+      <h1 class="post-title">Ultron</h1>
+      <p class="post-meta">@ · Jan 17, 2019 · 3 min read</p>
+    </header>
+    <article class="post-content">
+
+<h1 id="ultron使用手册">Ultron使用手册</h1>
+
+<p>[TOC]</p>
+
+<h2 id="1-开发背景">1. 开发背景</h2>
+
+<p>在一次与其他压测工具比较的过程中（<a href="https://phabricator.wosai-inc.com/T189），我无意发现之前使用的Locust有致命的性能问题：对于极快的GET接口，其产生的压力比AB、JMeter等少了几个量级，再加上我本身不满因Locust使用Python开发只能利用单核而导致经常需要多实例部署的情况，我决定利用Golang原生的高并发能力来重写一个压测工具。">https://phabricator.wosai-inc.com/T189），我无意发现之前使用的Locust有致命的性能问题：对于极快的GET接口，其产生的压力比AB、JMeter等少了几个量级，再加上我本身不满因Locust使用Python开发只能利用单核而导致经常需要多实例部署的情况，我决定利用Golang原生的高并发能力来重写一个压测工具。</a></p>
+
+<p>我希望它满足以下特性：</p>
+
+<ol>
+<li>单实力高并发能力</li>
+<li>支持分布式部署</li>
+<li>支持接入多种协议</li>
+<li>脚本层面借鉴Locust的方式，高度的定制化能力</li>
+</ol>
+
+<p>但与成熟的压测工具相比，Ultron存在以下明显的劣势：</p>
+
+<ol>
+<li>缺少GUI界面，门槛较高，需要一定的Golang编程能力</li>
+<li>更像一个“压测执行框架”，而不是工具</li>
+<li>目前仅接入http协议，插件也极少</li>
+<li>虽然开源（<a href="https://github.com/jacexh/ultron），但未做推广，使用者极少">https://github.com/jacexh/ultron），但未做推广，使用者极少</a></li>
+</ol>
+
+<h2 id="2-主要对象介绍">2 主要对象介绍</h2>
+
+<h3 id="2-1-attacker">2.1 Attacker</h3>
+
+<pre><code class="language-go">type Attacker interface {
+    Name() string
+    Fire() error
+}
+</code></pre>
+
+<p>Attacker是请求行为、事务的interface，结构体<code>HTTPAttacker</code>是该interface的一个实现，其作用是使用内置<code>net/http</code>包来处理http请求</p>
+
+<p>其中<code>Name()</code>方法返回了请求行为的名称，在http压测中，可以理解为接口名</p>
+
+<p><code>Fire()</code>方法是请求的行为，当结果返回为<code>nil</code>即没有错误时，则认为请求成功，反之视为请求失败，并记录具体的错误信息</p>
+
+<h3 id="2-2-runner">2.2 Runner</h3>
+
+<pre><code>type Runner interface {
+    WithConfig(*RunnerConfig)
+    WithTask(*Task)
+    GetConfig() *RunnerConfig
+    GetStatus() Status
+    Start()
+    Done()
+}
+</code></pre>
+
+<p>测试执行器，目前具体的实现有<code>localRunner</code>、<code>masterRunner</code>、<code>slaveRunner</code>，分别用于单机压测、分布式压测的控制台、分布式压测的节点</p>
+
+<h3 id="2-3-runnerconfig">2.3 RunnerConfig</h3>
+
+<pre><code class="language-go">type RunnerConfig struct {
+    Duration    time.Duration `json:&quot;duration&quot;`
+    Requests    uint64        `json:&quot;requests&quot;`
+    Concurrence int           `json:&quot;concurrence&quot;`
+    HatchRate   int           `json:&quot;hatch_rate&quot;`
+    MinWait     time.Duration `json:&quot;min_wait&quot;`
+    MaxWait     time.Duration `json:&quot;max_wait&quot;`
+}
+</code></pre>
+
+<p>一次压测任务的配置，分别解释下字段含义：</p>
+
+<ul>
+<li><code>Duration</code>：压测持续时间，当为0时，则不控制时长</li>
+<li><code>Requests</code>：压测请求总量，<strong>注意：该字段无法严格控制</strong></li>
+<li><code>Concurrenct</code>：压测并发数</li>
+<li><code>HatchRate</code>：压测开始时，每秒启动的线程(goroutine)数</li>
+<li><code>MinWait</code>、<code>MaxWait</code>：在一个线程(goroutine)中，两次连续的请求中间的等待时间间隔</li>
+</ul>
+
+<h3 id="2-4-task">2.4 Task</h3>
+
+<p>Runner运行的对象，是一个包含了多个<code>Attacker</code>对象的集合，可以为不同的<code>Attacker</code>设置权重，从而影响其压测的比例</p>
+
+<h2 id="3-内置的httpattacker使用">3. 内置的HTTPAttacker使用</h2>
+
+<p>一个简单的例子：</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;net/http&quot;
+
+	&quot;github.com/jacexh/ultron&quot;
+)
+
+const (
+	api = &quot;http://10.0.0.30/benchmark&quot;
+)
+
+func main() {
+	attacker := ultron.NewHTTPAttacker(
+        &quot;benchmark&quot;,
+        func() (*http.Request, error) {
+            return http.NewRequest(http.MethodGet, api, nil) }
+    )
+	task := ultron.NewTask()
+	task.Add(attacker, 1)
+
+	ultron.LocalRunner.WithTask(task)
+	ultron.LocalRunner.Start()
+}
+</code></pre>
+
+<p>内置的<code>HTTPAttacker</code>已经实现了<code>Fire()</code>方法，其负责将传入的<code>*http.Request</code>对象发送到目标地址，并且自行判断status_code等字段，并判断是否错误。</p>
+
+<p>而<code>*http.Request</code>从通过调用脚本层实现<code>HTTPAttacker.Prepay()</code>方法获取，如上面代码中的</p>
+
+<pre><code class="language-go">return http.NewRequest(http.MethodGet, api, nil)
+</code></pre>
+
+<p>另外，给一个稍微复杂点的例子  <a href="https://git.wosai-inc.com/qa/loadtest/blob/master/scenario-upay-gateway/bsc/main.go#L60">https://git.wosai-inc.com/qa/loadtest/blob/master/scenario-upay-gateway/bsc/main.go#L60</a> ：</p>
+
+<pre><code class="language-go">func newBSCRequest() (*http.Request, error) {
+	r := request{
+		TerminalSN:  terminalSN,
+		ClientSN:    atomic.AddUint64(&amp;csn, 1),
+		TotalAmount: 1,
+		Payway:      paywayAlipay,
+		DynamicID:   &quot;285208607915032042&quot;,
+		Subject:     &quot;wosai-inc&quot;,
+		Operator:    &quot;123456&quot;,
+	}
+	data, err := ultron.J.Marshal(r)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest(http.MethodPost, upayURL+&quot;/upay/v2/pay&quot;, bytes.NewBuffer(data))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set(&quot;Content-Type&quot;, &quot;application/json&quot;)
+	return req, nil
+}
+</code></pre>
+
+<p>上面提到了<code>HTTPAttacker.Fire</code>会自行校验status_code，但往往这是不够的，好在<code>HTTPAttacker</code>也支持脚本层定义检验函数：<code>func(*http.Response, []byte) error</code></p>
+
+<p>如校验支付网关的返回结果：</p>
+
+<pre><code class="language-go">func checkResponse(r *http.Response, body []byte) error {
+	resp := new(response)
+	err := ultron.J.Unmarshal(body, resp)
+	if err != nil {
+		return err
+	}
+	if resp.ResultCode != &quot;200&quot; {
+		return errors.New(resp.ErrorCode + &quot;::&quot; + resp.ErrorMessage)
+	}
+	if resp.Biz != nil &amp;&amp; !strings.Contains(resp.Biz.ResultCode, &quot;SUCCESS&quot;) {
+		if resp.Biz.Order != nil {
+			return errors.New(resp.Biz.ResultCode + &quot;@&quot; + resp.Biz.Order.SN)
+		}
+		return errors.New(resp.Biz.ResultCode + &quot;::&quot; + resp.Biz.ErrorCode + &quot;::&quot; + resp.Biz.ErrorMessage)
+	}
+	return nil
+}
+</code></pre>
+
+<h2 id="4-接入其他协议的attacker">4. 接入其他协议的Attacker</h2>
+
+<p>在上面介绍过了，理论上只要该协议能实现<code>Attacer</code>这个interface，即可被ultron支持，甚至还可以写出这样的<code>Attacker</code> <a href="https://github.com/jacexh/ultron/blob/master/example/benchmark/main.go">https://github.com/jacexh/ultron/blob/master/example/benchmark/main.go</a></p>
+
+<pre><code class="language-go">type (
+	benchmark struct{}
+)
+
+func (b benchmark) Name() string {
+	return &quot;benchmark&quot;
+}
+
+func (b benchmark) Fire() error {
+	time.Sleep(time.Millisecond * 10)
+	return nil
+}
+</code></pre>
+
+<p>稍微实际一点的例子——玛雅云压测：</p>
+
+<pre><code class="language-go">type MayaAttacker struct {
+	payload []byte
+	name    string
+	pool    *sync.Pool
+}
+
+func (m *MayaAttacker) Fire() error {
+	conn, err := net.DialTimeout(&quot;tcp&quot;, serverAddr, TimeoutConnect)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+	conn.SetWriteDeadline(time.Now().Add(TimeoutWrite))
+	_, err = conn.Write(m.payload)
+	if err != nil {
+		return err
+	}
+	conn.SetReadDeadline(time.Now().Add(TimeoutRead))
+	output := make([]byte, 512)
+	i, err := conn.Read(output)
+	if i == 0 &amp;&amp; err == nil {
+		return errors.New(&quot;invalid response&quot;)
+	}
+	return err
+}
+
+func (m *MayaAttacker) Name() string {
+	return m.name
+}
+</code></pre>
+
+<h2 id="5-eventhook">5. EventHook</h2>
+
+<p>目前具备<code>LocalEventHook</code>、<code>MasterEventHook</code>、<code>SalveEventHook</code>，并且支持对单次结果<code>*Result</code>以及每5秒一次的<code>Result</code>做扩展</p>
+
+<pre><code class="language-go">type ResultHandleFunc func(*Result)
+type ReportHandleFunc func(Report)
+</code></pre>
+
+<p>比如把这些数据实时写入influxdb （<a href="https://github.com/jacexh/ultron/blob/master/helper/influxdb.go）从而实现grafana的实时结果展示">https://github.com/jacexh/ultron/blob/master/helper/influxdb.go）从而实现grafana的实时结果展示</a></p>
+
+<h2 id="6-分布式执行">6. 分布式执行</h2>
+
+<p>当目标是百万级QPS或者并发时，你也许需要分布式执行来扩展能力了，但一般情况没有必要使用这种方式，另外要注意：<strong>我并没有严格测试分布式执行，不确定是否足够健壮</strong></p>
+
+<p>分布式执行的架构可以参考该文章：<a href="http://wiki.wosai-inc.com/pages/viewpage.action?pageId=64002088">http://wiki.wosai-inc.com/pages/viewpage.action?pageId=64002088</a></p>
+
+<p>slave节点的脚本如下：</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;net/http&quot;
+
+	&quot;github.com/jacexh/ultron&quot;
+	&quot;google.golang.org/grpc&quot;
+)
+
+func main() {
+	task := ultron.NewTask()
+	baidu := ultron.NewHTTPAttacker(&quot;nginx&quot;, func() (*http.Request, error) {
+		req, err := http.NewRequest(http.MethodGet, &quot;http://www.baidu.com/&quot;, nil)
+		if err != nil {
+			return nil, err
+		}
+		return req, nil
+	})
+	task.Add(baidu, 1)
+
+	ultron.SlaveRunner.Connect(&quot;127.0.0.1:9500&quot;, grpc.WithInsecure())
+	ultron.SlaveRunner.WithTask(task)
+	ultron.SlaveRunner.Start()
+}
+</code></pre>
+
+<p><code>RunnerConfig</code>参数将会由master节点下发，无须在slave脚本层定义</p>
+
+<p>通过调用master监听的http接口来<code>POST /start</code>触发任务的执行</p>
+
+<h2 id="7-todo">7. TODO</h2>
+
+<ol>
+<li>加个可爱的web ui</li>
+</ol>
+</article>
+    <footer class="post-footer">
+      
+      <p class="post-copyright">
+        
+      </p>
+    </footer>
+    
+      
+    
+  </section>
+  
+<footer class="site-footer">
+  <p>© 2017-2019 Jace&#39;s Blog</p>
+  <p>Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> with theme <a href="https://github.com/laozhu/hugo-nuo" target="_blank" rel="noopener">Nuo</a>.</p>
+  
+</footer>
+
+
+<script src="https://cdn.jsdelivr.net/npm/smooth-scroll@15.0.0/dist/smooth-scroll.min.js"></script>
+
+
+
+<script async src="https://cdn.jsdelivr.net/npm/video.js@7.3.0/dist/video.min.js"></script>
+
+
+
+
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      displayMath: [['$$','$$'], ['\\[','\\]']],
+      processEscapes: true,
+      processEnvironments: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+      TeX: { equationNumbers: { autoNumber: "AMS" },
+      extensions: ["AMSmath.js", "AMSsymbols.js"] }
+    },
+  });
+</script>
+<script type="text/x-mathjax-config">
+  // Fix <code> tags after MathJax finishes running. This is a
+  // hack to overcome a shortcoming of Markdown. Discussion at
+  // https://github.com/mojombo/jekyll/issues/199
+  MathJax.Hub.Queue(() => {
+    MathJax.Hub.getAllJax().map(v => v.SourceElement().parentNode.className += ' has-jax');
+  });
+</script>
+
+
+
+<script src="/scripts/index.min.js"></script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('\/service-worker.js').then(function() {
+      console.log('[ServiceWorker] Registered');
+    });
+  }
+</script>
+
+
+
+
+
+
+
+
+  </body>
+</html>
