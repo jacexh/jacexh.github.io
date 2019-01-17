@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://blog.xuh.me/post/test/</loc>
+    <lastmod>2019-01-17T18:20:51+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://blog.xuh.me/post/ultron/</loc>
     <lastmod>2019-01-17T15:25:19+08:00</lastmod>
   </url>
@@ -19,18 +24,31 @@
   
   <url>
     <loc>http://blog.xuh.me/</loc>
-    <lastmod>2019-01-17T15:25:19+08:00</lastmod>
+    <lastmod>2019-01-17T18:20:51+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://blog.xuh.me/post/</loc>
-    <lastmod>2019-01-17T15:25:19+08:00</lastmod>
+    <lastmod>2019-01-17T18:20:51+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xuh.me/tags/taga/</loc>
+    <lastmod>2019-01-17T18:20:51+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xuh.me/tags/tagb/</loc>
+    <lastmod>2019-01-17T18:20:51+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://blog.xuh.me/tags/</loc>
+    <lastmod>2019-01-17T18:20:51+08:00</lastmod>
     <priority>0</priority>
   </url>
   
