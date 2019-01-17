@@ -3,17 +3,34 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>http://example.org/categories/</loc>
+    <loc>http://blog.xuh.me/post/ultron/</loc>
+    <lastmod>2019-01-17T15:25:19+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://blog.xuh.me/post/second/</loc>
+    <lastmod>2019-01-17T15:23:40+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://blog.xuh.me/categories/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://example.org/</loc>
+    <loc>http://blog.xuh.me/</loc>
+    <lastmod>2019-01-17T15:25:19+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://example.org/tags/</loc>
+    <loc>http://blog.xuh.me/post/</loc>
+    <lastmod>2019-01-17T15:25:19+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xuh.me/tags/</loc>
     <priority>0</priority>
   </url>
   
