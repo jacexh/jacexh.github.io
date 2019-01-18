@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Taga on Jace&#39;s Blog</title>
-    <link>http://blog.xuh.me/tags/taga/</link>
-    <description>Recent content in Taga on Jace&#39;s Blog</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language>
-    <lastBuildDate>Thu, 17 Jan 2019 18:20:51 +0800</lastBuildDate>
-    
-	<atom:link href="http://blog.xuh.me/tags/taga/index.xml" rel="self" type="application/rss+xml" />
-    
-    
-    <item>
-      <title>Test</title>
-      <link>http://blog.xuh.me/post/test/</link>
-      <pubDate>Thu, 17 Jan 2019 18:20:51 +0800</pubDate>
-      
-      <guid>http://blog.xuh.me/post/test/</guid>
-      <description>&lt;p&gt;Cut out summary from your post content here.&lt;/p&gt;</description>
-    </item>
-    
-  </channel>
+	<channel>
+		<title>Taga on Jace&#39;s Blog</title>
+		<link>http://blog.xuh.me/tags/taga/</link>
+		<description>Recent content in Taga on Jace&#39;s Blog</description>
+		<generator>Hugo 0.53 -- gohugo.io</generator>
+		<language>zh-cn</language>
+		<managingEditor>jace.xh@gmail.com (jacexh)</managingEditor>
+		<webMaster>jace.xh@gmail.com (jacexh)</webMaster>
+		<copyright>xuh.me — All rights reserved.</copyright>
+		<lastBuildDate>Thu, 17 Jan 2019 18:20:51 +0800</lastBuildDate>
+		<atom:link href="http://blog.xuh.me/tags/taga/index.xml" rel="self" type="application/rss+xml" />
+		<item>
+			<title>Test</title>
+			<link>http://blog.xuh.me/posts/test/</link>
+			<pubDate>Thu, 17 Jan 2019 18:20:51 +0800</pubDate>
+			<author>jace.xh@gmail.com (jacexh)</author>
+			<guid>http://blog.xuh.me/posts/test/</guid>
+			<description>&lt;p&gt;Cut out summary from your post content here.&lt;/p&gt;
+
+&lt;p&gt;The remaining content of your post.&lt;/p&gt;</description>
+		</item>
+	</channel>
 </rss>
