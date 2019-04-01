@@ -13,10 +13,10 @@
 		<atom:link href="http://blog.xuh.me/tags/taga/index.xml" rel="self" type="application/rss+xml" />
 		<item>
 			<title>Test</title>
-			<link>http://blog.xuh.me/posts/test/</link>
+			<link>http://blog.xuh.me/posts/the-first-blog/</link>
 			<pubDate>Thu, 17 Jan 2019 18:20:51 +0800</pubDate>
 			<author>jace.xh@gmail.com (jacexh)</author>
-			<guid>http://blog.xuh.me/posts/test/</guid>
+			<guid>http://blog.xuh.me/posts/the-first-blog/</guid>
 			<description>&lt;p&gt;Cut out summary from your post content here.&lt;/p&gt;
 
 &lt;p&gt;The remaining content of your post.&lt;/p&gt;</description>
