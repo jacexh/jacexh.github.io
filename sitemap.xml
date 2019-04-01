@@ -3,41 +3,41 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>http://blog.xuh.me/posts/the-first-blog/</loc>
+    <loc>https://blog.xuh.me/posts/the-first-blog/</loc>
     <lastmod>2019-01-17T18:20:51+08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://blog.xuh.me/categories/</loc>
+    <loc>https://blog.xuh.me/categories/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://blog.xuh.me/</loc>
-    <lastmod>2019-01-17T18:20:51+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>http://blog.xuh.me/posts/</loc>
+    <loc>https://blog.xuh.me/</loc>
     <lastmod>2019-01-17T18:20:51+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://blog.xuh.me/tags/taga/</loc>
+    <loc>https://blog.xuh.me/posts/</loc>
     <lastmod>2019-01-17T18:20:51+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://blog.xuh.me/tags/tagb/</loc>
+    <loc>https://blog.xuh.me/tags/taga/</loc>
     <lastmod>2019-01-17T18:20:51+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://blog.xuh.me/tags/</loc>
+    <loc>https://blog.xuh.me/tags/tagb/</loc>
+    <lastmod>2019-01-17T18:20:51+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.xuh.me/tags/</loc>
     <lastmod>2019-01-17T18:20:51+08:00</lastmod>
     <priority>0</priority>
   </url>
