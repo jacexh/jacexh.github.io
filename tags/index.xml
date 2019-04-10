@@ -1,31 +1,36 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-	<channel>
-		<title>Tags on Jace&#39;s Blog</title>
-		<link>https://blog.xuh.me/tags/</link>
-		<description>Recent content in Tags on Jace&#39;s Blog</description>
-		<generator>Hugo 0.53 -- gohugo.io</generator>
-		<language>zh-cn</language>
-		<managingEditor>jace.xh@gmail.com (jacexh)</managingEditor>
-		<webMaster>jace.xh@gmail.com (jacexh)</webMaster>
-		<copyright>xuh.me — All rights reserved.</copyright>
-		<lastBuildDate>Wed, 10 Apr 2019 14:06:05 +0800</lastBuildDate>
-		<atom:link href="https://blog.xuh.me/tags/index.xml" rel="self" type="application/rss+xml" />
-		<item>
-			<title>Istio</title>
-			<link>https://blog.xuh.me/tags/istio/</link>
-			<pubDate>Wed, 10 Apr 2019 14:06:05 +0800</pubDate>
-			<author>jace.xh@gmail.com (jacexh)</author>
-			<guid>https://blog.xuh.me/tags/istio/</guid>
-			<description></description>
-		</item>
-		<item>
-			<title>Kubernetes</title>
-			<link>https://blog.xuh.me/tags/kubernetes/</link>
-			<pubDate>Wed, 10 Apr 2019 14:06:05 +0800</pubDate>
-			<author>jace.xh@gmail.com (jacexh)</author>
-			<guid>https://blog.xuh.me/tags/kubernetes/</guid>
-			<description></description>
-		</item>
-	</channel>
+  <channel>
+    <title>Tags on Jace&#39;s Blog</title>
+    <link>https://blog.xuh.me/tags/</link>
+    <description>Recent content in Tags on Jace&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <managingEditor>jace.xh@gmail.com (jacexh)</managingEditor>
+    <webMaster>jace.xh@gmail.com (jacexh)</webMaster>
+    <copyright>xuh.me — All rights reserved.</copyright>
+    <lastBuildDate>Wed, 10 Apr 2019 14:06:05 +0800</lastBuildDate>
+    
+	<atom:link href="https://blog.xuh.me/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Istio</title>
+      <link>https://blog.xuh.me/tags/istio/</link>
+      <pubDate>Wed, 10 Apr 2019 14:06:05 +0800</pubDate>
+      <author>jace.xh@gmail.com (jacexh)</author>
+      <guid>https://blog.xuh.me/tags/istio/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Kubernetes</title>
+      <link>https://blog.xuh.me/tags/kubernetes/</link>
+      <pubDate>Wed, 10 Apr 2019 14:06:05 +0800</pubDate>
+      <author>jace.xh@gmail.com (jacexh)</author>
+      <guid>https://blog.xuh.me/tags/kubernetes/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
 </rss>

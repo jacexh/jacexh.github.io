@@ -1,151 +1,142 @@
 <!DOCTYPE html>
-<html lang="zh-cn">
+<html>
 <head>
-  <meta charset="utf-8" />
-  <title>Jace&#39;s Blog</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="description" content="" />
-  <meta name="author" content="jacexh" />
-  <meta name="generator" content="Hugo 0.53" />
-  <link href="https://blog.xuh.me/index.xml" rel="alternate" type="application/rss+xml" title="Jace&#39;s Blog Feed" />
-  <link rel="shortcut icon" href="https://blog.xuh.me/favicon.ico" type="image/x-icon" />
-  <!--[if lte IE 8]>
-  <link rel="stylesheet" href="https://blog.xuh.me/assets/style-compat.css" />
-  <![endif]-->
-  <!--[if gt IE 8]><!-->
-  <link rel="stylesheet" href="https://blog.xuh.me/assets/style.css" />
-  <!--<![endif]-->
+    <title>Jace&#39;s Blog</title>
+
+        <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+        <meta property="og:title" content="Jace&#39;s Blog" />
+    <meta property="og:description" content="" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://blog.xuh.me/" />
+    
+
+    <link href="https://blog.xuh.me/index.xml" rel="alternate" type="application/rss+xml" title="Jace&#39;s Blog" />
+    <link rel="shortcut icon" href="/favicon.png">
+
+    <link href="https://blog.xuh.me/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+    <link href="https://blog.xuh.me/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="https://blog.xuh.me/css/style.css">
+
+    <meta name="generator" content="Hugo 0.53" />
 </head>
+
 <body>
-<div class="pure-g">
-  <div class="pure-u-1-24 pure-u-md-5-24"></div>
-  <div class="pure-u-22-24 pure-u-md-14-24">
-  <div class="navigation-header">
-  <div class="pure-menu pure-menu-horizontal">
-    <a class="pure-menu-heading pure-menu-link" href="/">
-      Jace&#39;s Blog
-    </a>
-  </div>
-</div>
-<div class="navigation-content">
-  <div class="pure-menu pure-menu-horizontal">
-    <ul class="pure-menu-list">
-      <li class="pure-menu-item pure-menu-selected">
-        <a  class="pure-menu-link" href="/">Home</a>
-      </li>
-      <li class="pure-menu-item">
-        <a  class="pure-menu-link" href="/posts">Posts</a>
-      </li>
-      <li class="pure-menu-item">
-        <a  class="pure-menu-link" href="/tags">Tags</a>
-      </li>
-    </ul>
-  </div>
-</div>
+<div id="container">
+    <header id="header">
+    <div id="header-outer" class="outer">
+        <div id="header-inner" class="inner">
+            <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+            <a id="logo" class="logo-text" href="https://blog.xuh.me/">Jace&#39;s Blog</a>
+            <nav id="main-nav">
+                
+                <a class="main-nav-link" href="/">Home</a>
+                
+                <a class="main-nav-link" href="/posts">Posts</a>
+                
+                <a class="main-nav-link" href="/tags">Tags</a>
+                
+            </nav>
+            <nav id="sub-nav">
+                <div id="search-form-wrap">
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
 
-  
-
-<p >
-  <div>
-    <h2 class="post-title">
-      
-      <a href="https://blog.xuh.me/posts/istio-source-code-analysis-00/">Istio源码走读-00</a>
-    </h2>
-    <div class="post-meta">
-  Date &#x5b;
-    <time datetime="2019-04-10T14:06:05&#43;08:00">04-10-2019</time>
-  &#x5d;
-  Tags &#x5b;
-    <a href="https://blog.xuh.me/tags/istio/">istio</a>
-    <a href="https://blog.xuh.me/tags/kubernetes/">kubernetes</a>
-  &#x5d;
-</div>
-
-  </div>
-  <div>
-     近期因为要用上istio做多测试环境的管理，为了能更清楚的了解其内部实现原理，打算花点时间来阅读下它的源码。
+    <section id="main" class="outer">
+        
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+            <div class="article-inner">
+                
+                
+                <header class="article-header">
+                    <h1 itemprop="name"><a class="article-title" href="/posts/istio-source-code-analysis-00/">Istio源码走读-00</a></h1>
+                </header>
+                
+                <div class="article-meta">
+                    <a href="/posts/istio-source-code-analysis-00/" class="article-date">
+                        <time datetime='2019-04-10T14:06:05.000&#43;08:00' itemprop="datePublished">2019-04-10</time>
+                    </a>
+                    
+                    
+                    
+                    <div class="article-comment-link-wrap">
+                        <a href="/posts/istio-source-code-analysis-00/#disqus_thread" class="article-comment-link">Comments</a>
+                    </div>
+                    
+                </div>
+                <div class="article-entry" itemprop="articleBody">
+                    <p>
+                        
+                     近期因为要用上istio做多测试环境的管理，为了能更清楚的了解其内部实现原理，打算花点时间来阅读下它的源码。
 Istio开发环境准备 istio的源码托管https://github.com/istio/istio上，建议clone到本地以下目录中：
 git clone git@github.com:istio/istio.git $GOPATH/src/istio.io/istio 我这边使用GoLand阅读代码，也可以使用Visual Studio Code等其他顺手的编辑器来阅读。
 Pilot模块 
-  </div>
-</p>
+                    </p>
+                    <p class="article-more-link">
+                        <a href="/posts/istio-source-code-analysis-00/">Read More</a>
+                    </p>
+                </div>
 
+                
+                <footer class="article-footer">
+                    <ul class="article-tag-list">
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/istio">istio
+                            </a>
+                        </li>
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/kubernetes">kubernetes
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </footer>
+                
+            </div>
+        </article>
+        
 
-<div class="pagination-content">
-  <div class="pure-menu pure-menu-horizontal">
-    <ul class="pure-menu-list">
-      <span class="pure-menu-item pure-menu-disabled">
-        Pages
-      </span>
-      <li class="pure-menu-item pure-menu-selected">
-        <a href="/" class="pure-menu-link">First</a>
-      </li>
-      <li class="pure-menu-item pure-menu-selected">
-        <a href="/" class="pure-menu-link">Last</a>
-      </li>
-    </ul>
-  </div>
-</div>
+        
 
-  <div class="footer-content">
-  <div class="pure-menu pure-menu-horizontal">
-    <ul class="pure-menu-list">
-      <li class="pure-menu-item">
-        <a class="pure-menu-link" href="https://github.com/jacexh">Github</a>
-      </li>
-      <li class="pure-menu-item">
-        <a class="pure-menu-link" href="https://twitter.com/jacexh">Twitter</a>
-      </li>
-      <li class="pure-menu-item">
-        <a href="https://blog.xuh.me/index.xml" class="pure-menu-link">RSS</a>
-      </li>
-      <li class="pure-menu-item">
-        <a class="pure-menu-link" id="btn-gototop">
-          <span class="fixup">&#x21e7;&#xfe0e;</span>
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div class="pure-menu pure-menu-horizontal">
-    <ul class="pure-menu-list">
-      <li class="pure-menu-item pure-menu-disabled">
-        &copy; 2019 &mdash; xuh.me — All rights reserved.
-      </li>
-    </ul>
-  </div>
-</div>
-<script>
-  function setElementsClass(selector, value) {
-    Array.prototype.forEach.call(
-      document.querySelectorAll(selector),
-      function(elem) { elem.className = value; }
-    );
-  }
+    </section>
+    <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2019 jacexh
+            <br />
+            Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> with theme <a href="https://github.com/carsonip/hugo-theme-minos" target="_blank">Minos</a>
+        </div>
+    </div>
+    
 
-  setElementsClass('img', 'pure-img');
-  setElementsClass('table', 'pure-table');
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/tomorrow-night.min.css" integrity="sha256-2wL88NKUqvJi/ExflDzkzUumjUM73mcK2gBvBBeLvTk=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js" integrity="sha256-KbfTjB0WZ8vvXngdpJGY3Yp3xKk+tttbqClO11anCIU=" crossorigin="anonymous"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
 
-  function onResize() {
-      setElementsClass(
-        '.pure-menu', document.documentElement.clientWidth >= 568 ?
-              'pure-menu pure-menu-horizontal' : 'pure-menu'
-      );
-  }
-  onResize();
-  window.addEventListener('resize', onResize);
+    
+    <script>
+        document.getElementById('main-nav-toggle').addEventListener('click', function () {
+            var header = document.getElementById('header');
+            if (header.classList.contains('mobile-on')) {
+                header.classList.remove('mobile-on');
+            } else {
+                header.classList.add('mobile-on');
+            }
+        });
+    </script>
+</footer>
 
-  document.getElementById('btn-gototop').addEventListener('click', function() {
-    function scroll() {
-      if (window.pageYOffset > 0) { setTimeout(scroll, 8); }
-      window.scroll(0, window.pageYOffset - 128);
-    }
-    scroll();
-  });
-</script>
-
-  </div>
-  <div class="pure-u-1-24 pure-u-md-5-24"></div>
 </div>
 </body>
 </html>
