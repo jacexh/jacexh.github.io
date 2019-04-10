@@ -9,22 +9,22 @@
 		<managingEditor>jace.xh@gmail.com (jacexh)</managingEditor>
 		<webMaster>jace.xh@gmail.com (jacexh)</webMaster>
 		<copyright>xuh.me — All rights reserved.</copyright>
-		<lastBuildDate>Thu, 17 Jan 2019 18:20:51 +0800</lastBuildDate>
+		<lastBuildDate>Wed, 10 Apr 2019 14:06:05 +0800</lastBuildDate>
 		<atom:link href="https://blog.xuh.me/tags/index.xml" rel="self" type="application/rss+xml" />
 		<item>
-			<title>Taga</title>
-			<link>https://blog.xuh.me/tags/taga/</link>
-			<pubDate>Thu, 17 Jan 2019 18:20:51 +0800</pubDate>
+			<title>Istio</title>
+			<link>https://blog.xuh.me/tags/istio/</link>
+			<pubDate>Wed, 10 Apr 2019 14:06:05 +0800</pubDate>
 			<author>jace.xh@gmail.com (jacexh)</author>
-			<guid>https://blog.xuh.me/tags/taga/</guid>
+			<guid>https://blog.xuh.me/tags/istio/</guid>
 			<description></description>
 		</item>
 		<item>
-			<title>Tagb</title>
-			<link>https://blog.xuh.me/tags/tagb/</link>
-			<pubDate>Thu, 17 Jan 2019 18:20:51 +0800</pubDate>
+			<title>Kubernetes</title>
+			<link>https://blog.xuh.me/tags/kubernetes/</link>
+			<pubDate>Wed, 10 Apr 2019 14:06:05 +0800</pubDate>
 			<author>jace.xh@gmail.com (jacexh)</author>
-			<guid>https://blog.xuh.me/tags/tagb/</guid>
+			<guid>https://blog.xuh.me/tags/kubernetes/</guid>
 			<description></description>
 		</item>
 	</channel>

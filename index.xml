@@ -9,17 +9,26 @@
 		<managingEditor>jace.xh@gmail.com (jacexh)</managingEditor>
 		<webMaster>jace.xh@gmail.com (jacexh)</webMaster>
 		<copyright>xuh.me — All rights reserved.</copyright>
-		<lastBuildDate>Thu, 17 Jan 2019 18:20:51 +0800</lastBuildDate>
+		<lastBuildDate>Wed, 10 Apr 2019 14:06:05 +0800</lastBuildDate>
 		<atom:link href="https://blog.xuh.me/index.xml" rel="self" type="application/rss+xml" />
 		<item>
-			<title>Test</title>
-			<link>https://blog.xuh.me/posts/the-first-blog/</link>
-			<pubDate>Thu, 17 Jan 2019 18:20:51 +0800</pubDate>
+			<title>Istio源码走读-00</title>
+			<link>https://blog.xuh.me/posts/istio-source-code-analysis-00/</link>
+			<pubDate>Wed, 10 Apr 2019 14:06:05 +0800</pubDate>
 			<author>jace.xh@gmail.com (jacexh)</author>
-			<guid>https://blog.xuh.me/posts/the-first-blog/</guid>
-			<description>&lt;p&gt;Cut out summary from your post content here.&lt;/p&gt;
+			<guid>https://blog.xuh.me/posts/istio-source-code-analysis-00/</guid>
+			<description>
 
-&lt;p&gt;The remaining content of your post.&lt;/p&gt;</description>
+&lt;p&gt;近期因为要用上&lt;code&gt;istio&lt;/code&gt;做多测试环境的管理，为了能更清楚的了解其内部实现原理，打算花点时间来阅读下它的源码。&lt;/p&gt;
+
+&lt;h3 id=&#34;istio开发环境准备&#34;&gt;Istio开发环境准备&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;istio&lt;/code&gt;的源码托管&lt;strong&gt;&lt;a href=&#34;https://github.com/istio/istio&#34;&gt;https://github.com/istio/istio&lt;/a&gt;&lt;/strong&gt;上，建议clone到本地以下目录中：&lt;code&gt;git clone git@github.com:istio/istio.git $GOPATH/src/istio.io/istio&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;我这边使用&lt;code&gt;GoLand&lt;/code&gt;阅读代码，也可以使用&lt;code&gt;Visual Studio Code&lt;/code&gt;等其他顺手的编辑器来阅读。&lt;/p&gt;
+
+&lt;h3 id=&#34;pilot模块&#34;&gt;Pilot模块&lt;/h3&gt;
+</description>
 		</item>
 	</channel>
 </rss>

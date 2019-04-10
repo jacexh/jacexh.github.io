@@ -3,8 +3,8 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://blog.xuh.me/posts/the-first-blog/</loc>
-    <lastmod>2019-01-17T18:20:51+08:00</lastmod>
+    <loc>https://blog.xuh.me/posts/istio-source-code-analysis-00/</loc>
+    <lastmod>2019-04-10T14:06:05+08:00</lastmod>
   </url>
   
   <url>
@@ -13,32 +13,32 @@
   </url>
   
   <url>
+    <loc>https://blog.xuh.me/tags/istio/</loc>
+    <lastmod>2019-04-10T14:06:05+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://blog.xuh.me/</loc>
-    <lastmod>2019-01-17T18:20:51+08:00</lastmod>
+    <lastmod>2019-04-10T14:06:05+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.xuh.me/tags/kubernetes/</loc>
+    <lastmod>2019-04-10T14:06:05+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://blog.xuh.me/posts/</loc>
-    <lastmod>2019-01-17T18:20:51+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://blog.xuh.me/tags/taga/</loc>
-    <lastmod>2019-01-17T18:20:51+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://blog.xuh.me/tags/tagb/</loc>
-    <lastmod>2019-01-17T18:20:51+08:00</lastmod>
+    <lastmod>2019-04-10T14:06:05+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://blog.xuh.me/tags/</loc>
-    <lastmod>2019-01-17T18:20:51+08:00</lastmod>
+    <lastmod>2019-04-10T14:06:05+08:00</lastmod>
     <priority>0</priority>
   </url>
   
