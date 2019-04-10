@@ -106,6 +106,58 @@ Pilot模块
             </div>
         </article>
         
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+            <div class="article-inner">
+                
+                
+                <header class="article-header">
+                    <h1 itemprop="name"><a class="article-title" href="/posts/distribution-system-knowledge-point/">分布式系统基础知识</a></h1>
+                </header>
+                
+                <div class="article-meta">
+                    <a href="/posts/distribution-system-knowledge-point/" class="article-date">
+                        <time datetime='2019-04-09T10:06:05.000&#43;08:00' itemprop="datePublished">2019-04-09</time>
+                    </a>
+                    
+                    
+                    
+                    <div class="article-comment-link-wrap">
+                        <a href="/posts/distribution-system-knowledge-point/#disqus_thread" class="article-comment-link">Comments</a>
+                    </div>
+                    
+                </div>
+                <div class="article-entry" itemprop="articleBody">
+                    <p>
+                        
+                    CAP定理 布鲁尔定理，它指出对于一个分布式计算系统来说，不可能同时满足一下三点：
+ 一致性(Consistency): 所有节点访问同一份最新的数据副本 可用性(Availability)：每次请求都能获取到非错的响应-但是不保证获取的数据为最新数据 分区容错性（Partition tolerance）：系统如果不能在时限内达成数据一致性，就意味着发生了分区的情况，必须就当前操作在C和A之间做出选择  分布式数据调度  CA：关注一致性和可用性，它需要非常严格的全体一致的协议 CP：关注一致性和分区容忍性，关注系统里大多数人的一致性 AP：关注可用性和分区容忍性，无法达成一致性  2PC - 二阶段提交  表决阶段：协调者向所有参与者发送一个vote request，参与者确认后返回VOTE_COMMIT/VOTE_ABORT 提交阶段：协调者收到所有参与者的表决信息，如果参与者一致认为可以提交事务，那么协调者发送GLOBAL_COMMIT/GLOBAL_ABORT  3PC Gossip算法  Push: 发起信息交换的节点A随机选择联系节点B，并向其发送自己的信息，节点B在收到信息后更新比自己新的数据，一般拥有新信息的节点才会作为发起节点 Pull：发起信息交换的节点A随机选择联系节点B，并从对方获取信息。一般无新信息的节点才会作为发起节点  Paxos算法 Neat Algorithms - Paxos
+Raft算法 分成以下部分：
+ Leader Selection Log Replication Safety Membership Changes  Raft - The Secret Lives of Data
+异步通讯 请求响应式 发送方(sender)会直接请求接收方(receiver)，被请求方接收到请求后，直接返回 - 收到请求，正在处理
+ 轮询模式 回调模式  订阅方式 receiver订阅sender的消息，sender会把相关的消息或者数据放到receiver所订阅的队列中，而接收方会从队列中获取数据。
+通过Broker的方式 Broker中间人
+ 必须是高可用的 必须是高性能而且可以水平扩展的 必须是可以持久化不丢数据的  分布式事务 ACID  原子性（Atomicity）: 整个事务中的所有操作，要么全部完成、要么全部失败，不可能在中间某个环节 一致性（Consistency）：在事务开始之前和事务结束之后，数据库的完整性约束没有被破坏 隔离性（Isolation）：两个事务的执行是互不干扰的，一个事务不可能看到其他事务运行中间某一时刻的数据 持久性（Durability）：在事务完成后，该事务对数据库的所做的更改便持久地保存在数据库之中，并不会被回滚。  BASE  Base Availability: 基本可用。系统可以出现暂时不可用的状态，而后面会快速恢复 Soft-state: 软状态。介于&rdquo;有状态&rdquo;Stateful和“无状态”Stateless的服务的一种中间状态。为了提高性能，可以让服务暂时保存一些状态或数据，这些状态和数据不是强一致性的。 Eventual Consistency: 最终一致性，系统在一个短暂的时间段内是不一致的，但最终整个系统看到的数据是一致的。  幂等性 一次和多次请求资源某一个资源应该具备同样的副作用：f(x) = f(f(x))
+                    </p>
+                    <p class="article-more-link">
+                        <a href="/posts/distribution-system-knowledge-point/">Read More</a>
+                    </p>
+                </div>
+
+                
+                <footer class="article-footer">
+                    <ul class="article-tag-list">
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F">分布式系统
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </footer>
+                
+            </div>
+        </article>
+        
 
         
 

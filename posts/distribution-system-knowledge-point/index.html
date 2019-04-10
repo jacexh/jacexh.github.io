@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>分布式系统基础知识 // Jace&#39;s Blog</title>
+
+        <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+        <meta property="og:title" content="分布式系统基础知识" />
+    <meta property="og:description" content="" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://blog.xuh.me/posts/distribution-system-knowledge-point/" />
+    
+
+    <link href="" rel="alternate" type="application/rss+xml" title="Jace&#39;s Blog" />
+    <link rel="shortcut icon" href="/favicon.png">
+
+    <link href="https://blog.xuh.me/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+    <link href="https://blog.xuh.me/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="https://blog.xuh.me/css/style.css">
+
+    <meta name="generator" content="Hugo 0.53" />
+</head>
+
+
+<body>
+<div id="container">
+    <header id="header">
+    <div id="header-outer" class="outer">
+        <div id="header-inner" class="inner">
+            <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+            <a id="logo" class="logo-text" href="https://blog.xuh.me/">Jace&#39;s Blog</a>
+            <nav id="main-nav">
+                
+                <a class="main-nav-link" href="/">Home</a>
+                
+                <a class="main-nav-link" href="/posts">Posts</a>
+                
+                <a class="main-nav-link" href="/tags">Tags</a>
+                
+            </nav>
+            <nav id="sub-nav">
+                <div id="search-form-wrap">
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+
+    <section id="main" class="outer">
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        <header class="article-header">
+            <h1 class="article-title" itemprop="name">分布式系统基础知识</h1>
+        </header>
+        
+        <div class="article-meta">
+            <a href="/posts/distribution-system-knowledge-point/" class="article-date">
+                <time datetime='2019-04-09T10:06:05.000&#43;08:00' itemprop="datePublished">2019-04-09</time>
+            </a>
+            
+            
+            
+            <div class="article-comment-link-wrap">
+                <a href="/posts/distribution-system-knowledge-point/#disqus_thread" class="article-comment-link">Comments</a>
+            </div>
+            
+        </div>
+        <div class="article-entry" itemprop="articleBody">
+            
+
+<h2 id="cap定理">CAP定理</h2>
+
+<p>布鲁尔定理，它指出对于一个分布式计算系统来说，不可能同时满足一下三点：</p>
+
+<ul>
+<li>一致性(Consistency): 所有节点访问同一份最新的数据副本</li>
+<li>可用性(Availability)：每次请求都能获取到非错的响应-但是不保证获取的数据为最新数据</li>
+<li>分区容错性（Partition tolerance）：系统如果不能在时限内达成数据一致性，就意味着发生了分区的情况，必须就当前操作在C和A之间做出选择</li>
+</ul>
+
+<h2 id="分布式数据调度">分布式数据调度</h2>
+
+<p><img src="https://static001.infoq.cn/resource/image/d9/a6/d98d65bef3719e175f16bdb5901f37a6.png" alt="" /></p>
+
+<ul>
+<li>CA：关注一致性和可用性，它需要非常严格的全体一致的协议</li>
+<li>CP：关注一致性和分区容忍性，关注系统里大多数人的一致性</li>
+<li>AP：关注可用性和分区容忍性，无法达成一致性</li>
+</ul>
+
+<p><img src="https://static001.geekbang.org/resource/image/95/50/95e0fd0862be0e3489713687bf363f50.png" alt="" /></p>
+
+<h3 id="2pc-二阶段提交">2PC - 二阶段提交</h3>
+
+<p><img src="http://matt33.com/images/distribute/2pc_process.png" alt="" /></p>
+
+<ol>
+<li>表决阶段：协调者向所有参与者发送一个<code>vote request</code>，参与者确认后返回<code>VOTE_COMMIT</code>/<code>VOTE_ABORT</code></li>
+<li>提交阶段：协调者收到所有参与者的表决信息，如果参与者一致认为可以提交事务，那么协调者发送<code>GLOBAL_COMMIT</code>/<code>GLOBAL_ABORT</code></li>
+</ol>
+
+<h4 id="3pc">3PC</h4>
+
+<p><img src="http://matt33.com/images/distribute/Three-phase_commit_diagram.png" alt="" /></p>
+
+<h3 id="gossip算法">Gossip算法</h3>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20190408161840.gif" alt="" /></p>
+
+<ul>
+<li>Push: 发起信息交换的节点A随机选择联系节点B，并向其发送自己的信息，节点B在收到信息后更新比自己新的数据，一般拥有新信息的节点才会作为发起节点</li>
+<li>Pull：发起信息交换的节点A随机选择联系节点B，并从对方获取信息。一般无新信息的节点才会作为发起节点</li>
+</ul>
+
+<h3 id="paxos算法">Paxos算法</h3>
+
+<p><a href="http://harry.me/blog/2014/12/27/neat-algorithms-paxos/">Neat Algorithms - Paxos</a></p>
+
+<h4 id="raft算法">Raft算法</h4>
+
+<p>分成以下部分：</p>
+
+<ul>
+<li>Leader Selection</li>
+<li>Log Replication</li>
+<li>Safety</li>
+<li>Membership Changes</li>
+</ul>
+
+<p><a href="http://thesecretlivesofdata.com/raft/">Raft - The Secret Lives of Data</a></p>
+
+<h2 id="异步通讯">异步通讯</h2>
+
+<h3 id="请求响应式">请求响应式</h3>
+
+<p>发送方(<code>sender</code>)会直接请求接收方(<code>receiver</code>)，被请求方接收到请求后，直接返回 - 收到请求，正在处理</p>
+
+<ul>
+<li>轮询模式</li>
+<li>回调模式</li>
+</ul>
+
+<h3 id="订阅方式">订阅方式</h3>
+
+<p><code>receiver</code>订阅<code>sender</code>的消息，<code>sender</code>会把相关的消息或者数据放到<code>receiver</code>所订阅的队列中，而接收方会从队列中获取数据。</p>
+
+<h3 id="通过broker的方式">通过Broker的方式</h3>
+
+<p><code>Broker</code>中间人</p>
+
+<p><img src="https://static001.geekbang.org/resource/image/aa/17/aa1c6db18e706012e8028b4d1bddb917.png" alt="" /></p>
+
+<ul>
+<li>必须是高可用的</li>
+<li>必须是高性能而且可以水平扩展的</li>
+<li>必须是可以持久化不丢数据的</li>
+</ul>
+
+<h2 id="分布式事务">分布式事务</h2>
+
+<h3 id="acid">ACID</h3>
+
+<ul>
+<li>原子性（Atomicity）: 整个事务中的所有操作，要么全部完成、要么全部失败，不可能在中间某个环节</li>
+<li>一致性（Consistency）：在事务开始之前和事务结束之后，数据库的完整性约束没有被破坏</li>
+<li>隔离性（Isolation）：两个事务的执行是互不干扰的，一个事务不可能看到其他事务运行中间某一时刻的数据</li>
+<li>持久性（Durability）：在事务完成后，该事务对数据库的所做的更改便持久地保存在数据库之中，并不会被回滚。</li>
+</ul>
+
+<h3 id="base">BASE</h3>
+
+<ul>
+<li>Base Availability: 基本可用。系统可以出现暂时不可用的状态，而后面会快速恢复</li>
+<li>Soft-state: 软状态。介于&rdquo;有状态&rdquo;<code>Stateful</code>和“无状态”<code>Stateless</code>的服务的一种中间状态。为了提高性能，可以让服务暂时保存一些状态或数据，这些状态和数据不是强一致性的。</li>
+<li>Eventual Consistency: 最终一致性，系统在一个短暂的时间段内是不一致的，但最终整个系统看到的数据是一致的。</li>
+</ul>
+
+<h2 id="幂等性">幂等性</h2>
+
+<p>一次和多次请求资源某一个资源应该具备同样的副作用：<code>f(x) = f(f(x))</code></p>
+
+<blockquote>
+<p>调用创建订单接口，第一次调用网络超时了，调用方应该怎么办？</p>
+</blockquote>
+
+<ul>
+<li>下游系统提供查询接口，超时之后查询一次，然后再做判断</li>
+<li>下游系统保证接口幂等，重新发起创建订单接口的调用，由下游系统保证一次和多次的请求结果一致</li>
+</ul>
+
+<p>关键在于：<strong>全局唯一ID</strong></p>
+
+<h2 id="弹性设计">弹性设计</h2>
+
+<h3 id="熔断">熔断</h3>
+
+<p><img src="https://static001.geekbang.org/resource/image/8e/c8/8ef7cf499441cb79efe2d3efcc54abc8.jpg" alt="" /></p>
+
+<p>熔断器的几种状态：</p>
+
+<ul>
+<li>闭合状态（Closed）</li>
+<li>断开状态（Open）</li>
+<li>半开状态（Half-Open）：允许应用程序一定数量的请求去调用服务</li>
+</ul>
+
+<h3 id="限流">限流</h3>
+
+<p>限流的策略：</p>
+
+<ul>
+<li>拒绝服务</li>
+<li>服务降级</li>
+<li>特权请求</li>
+<li>延时处理</li>
+<li>弹性收缩</li>
+</ul>
+
+<p>限流的实现：</p>
+
+<ul>
+<li>计数器</li>
+<li>队列算法
+<img src="https://static001.geekbang.org/resource/image/c8/3d/c8f774f88ab8a4b72378971263c0393d.png" alt="" /></li>
+<li>漏斗算法
+<img src="https://static001.geekbang.org/resource/image/95/00/95326ea1624d4206a26ff275b39efc00.png" alt="" /></li>
+<li>令牌桶算法
+<img src="https://static001.geekbang.org/resource/image/99/f0/996b8d60ed90c470ce839f8826e375f0.png" alt="" /></li>
+<li>基于响应时间的动态限流</li>
+</ul>
+
+<h3 id="降级">降级</h3>
+
+<ul>
+<li>降低一致性：从强一致性变成最终一致性</li>
+<li>停止次要功能：停止访问不重要的功能，从而释放出更多的资源</li>
+<li>简化功能：把一些功能简化掉</li>
+</ul>
+
+<h2 id="性能设计">性能设计</h2>
+
+<h3 id="缓存">缓存</h3>
+
+<h4 id="cache-aside">Cache Aside</h4>
+
+<p><img src="https://static001.geekbang.org/resource/image/0a/d4/0a39fbce98c0d43e15b56b0ed09099d4.png" alt="" /></p>
+
+<p><img src="https://static001.geekbang.org/resource/image/e0/94/e0ecbc94d474f7bd0c8eb53dfd8bde94.png" alt="" /></p>
+
+<ul>
+<li>失效：应用程序先从Cache取数据，如果没有得到，则从数据库中取数据，成功后，放到缓存后</li>
+<li>命中：应用程序从Cache中取数据，取到后返回</li>
+<li>更新：先把数据存到数据库中，成功后，再让缓存失效</li>
+</ul>
+
+<h4 id="read-write-through">Read/Write Through</h4>
+
+<p><img src="https://static001.geekbang.org/resource/image/2c/dd/2ce5afe305e60d98bf3b647ef23f3edd.png" alt="" /></p>
+
+<ul>
+<li>Read Through: 查询操作中更新缓存，当缓存失效时，Read Through缓存服务自己加载新数据</li>
+<li>Write Through:  当数据更新得时候，如果没有命中缓存，直接更新数据库；如果命中缓存，则更新缓存，然后由Cache自己更新数据库</li>
+</ul>
+
+<h4 id="write-behind-caching">Write Behind Caching</h4>
+
+<p>在更新数据的时候，只更新缓存，不更新数据库，缓存会异步地批量地更新数据库，而且可以<strong>合并同一个数据的多次操作</strong></p>
+
+<h3 id="异步处理">异步处理</h3>
+
+<h3 id="数据库扩展">数据库扩展</h3>
+
+<h4 id="读写分离">读写分离</h4>
+
+<p><img src="https://static001.geekbang.org/resource/image/77/71/77892f8385a4fa21e97ca41075780b71.png" alt="" /></p>
+
+<p>优势：</p>
+
+<ul>
+<li>容易实现</li>
+<li>业务隔离性好</li>
+<li>分担数据库的读操作</li>
+</ul>
+
+<p>劣势：</p>
+
+<ul>
+<li>写库有单点故障问题</li>
+<li>同步不实时</li>
+</ul>
+
+<h4 id="分库分表-sharding">分库分表 Sharding</h4>
+
+<p><img src="https://static001.geekbang.org/resource/image/8a/64/8ab721d3d6512a7f607fe393f6550f64.png" alt="" /></p>
+
+<p><strong>分片策略必须依赖业务知识</strong></p>
+
+<h3 id="秒杀">秒杀</h3>
+
+<blockquote>
+<p>活动：<code>苹果手机5折抢购</code>，限量100台，预计一百万人抢购，系统理论处理能力1000TPS</p>
+</blockquote>
+
+<p>挑战：</p>
+
+<ul>
+<li>网络</li>
+<li>数据库：单一记录热点数据</li>
+</ul>
+
+<h2 id="分布式锁">分布式锁</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Counter</span> <span style="color:#66d9ef">struct</span> {
+	<span style="color:#a6e22e">mu</span>  <span style="color:#a6e22e">sync</span>.<span style="color:#a6e22e">Mutex</span>
+	<span style="color:#a6e22e">val</span> <span style="color:#66d9ef">int32</span>
+}
+
+<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">c</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Counter</span>) <span style="color:#a6e22e">increase</span>() {
+	<span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">mu</span>.<span style="color:#a6e22e">Lock</span>()
+	<span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">val</span><span style="color:#f92672">++</span>
+	<span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">mu</span>.<span style="color:#a6e22e">Unlock</span>()
+}
+
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">BenchmarkAtomicSingleGoroutine</span>(<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">testing</span>.<span style="color:#a6e22e">B</span>) {
+	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">val</span> <span style="color:#66d9ef">int32</span>
+	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> &lt; <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">N</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span> {
+		<span style="color:#a6e22e">atomic</span>.<span style="color:#a6e22e">AddInt32</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">val</span>, <span style="color:#ae81ff">1</span>)
+	}
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">val</span>)
+}
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">BenchmarkMutexSingleGoroutine</span>(<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">testing</span>.<span style="color:#a6e22e">B</span>) {
+	<span style="color:#a6e22e">c</span> <span style="color:#f92672">:=</span> new(<span style="color:#a6e22e">Counter</span>)
+
+	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> &lt; <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">N</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span> {
+		<span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">increase</span>()
+	}
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">val</span>)
+}</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Testcase</th>
+<th>Result</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>BenchmarkAtomicSingleGoroutine</td>
+<td>5.36 ns/op</td>
+</tr>
+
+<tr>
+<td>BenchmarkAtomicSingleGoroutine</td>
+<td>15.4 ns/op</td>
+</tr>
+
+<tr>
+<td>BenchmarkAtomicMultipleGoroutines</td>
+<td>584 ns/op</td>
+</tr>
+
+<tr>
+<td>BenchmarkMutexMultipleGoroutines</td>
+<td>624 ns/op</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="cas-compare-and-swap">CAS: <code>Compare-and-Swap</code></h3>
+
+<blockquote>
+<p>原子操作：不可被中断的一个或一系列操作</p>
+</blockquote>
+
+<ul>
+<li>MySQL</li>
+<li>Redis</li>
+<li>ZooKeeper</li>
+</ul>
+
+<p>问题点：</p>
+
+<ul>
+<li>如果获得锁的进程挂掉：锁服务加上过期时间</li>
+<li>如果锁服务自动解锁，新的进程拿到锁，原进程以为自己还有锁</li>
+<li>锁服务高可用</li>
+</ul>
+
+<h2 id="学习金字塔">学习金字塔</h2>
+
+<p><img src="https://static001.geekbang.org/resource/image/6b/55/6b9c41e6c4c4d43c1a40effce1a8d855.png" alt="" /></p>
+
+        </div>
+
+        
+        
+        <div class="article-toc" style="display:none;">
+            <h3>Contents</h3>
+            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#cap定理">CAP定理</a></li>
+<li><a href="#分布式数据调度">分布式数据调度</a>
+<ul>
+<li><a href="#2pc-二阶段提交">2PC - 二阶段提交</a>
+<ul>
+<li><a href="#3pc">3PC</a></li>
+</ul></li>
+<li><a href="#gossip算法">Gossip算法</a></li>
+<li><a href="#paxos算法">Paxos算法</a>
+<ul>
+<li><a href="#raft算法">Raft算法</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#异步通讯">异步通讯</a>
+<ul>
+<li><a href="#请求响应式">请求响应式</a></li>
+<li><a href="#订阅方式">订阅方式</a></li>
+<li><a href="#通过broker的方式">通过Broker的方式</a></li>
+</ul></li>
+<li><a href="#分布式事务">分布式事务</a>
+<ul>
+<li><a href="#acid">ACID</a></li>
+<li><a href="#base">BASE</a></li>
+</ul></li>
+<li><a href="#幂等性">幂等性</a></li>
+<li><a href="#弹性设计">弹性设计</a>
+<ul>
+<li><a href="#熔断">熔断</a></li>
+<li><a href="#限流">限流</a></li>
+<li><a href="#降级">降级</a></li>
+</ul></li>
+<li><a href="#性能设计">性能设计</a>
+<ul>
+<li><a href="#缓存">缓存</a>
+<ul>
+<li><a href="#cache-aside">Cache Aside</a></li>
+<li><a href="#read-write-through">Read/Write Through</a></li>
+<li><a href="#write-behind-caching">Write Behind Caching</a></li>
+</ul></li>
+<li><a href="#异步处理">异步处理</a></li>
+<li><a href="#数据库扩展">数据库扩展</a>
+<ul>
+<li><a href="#读写分离">读写分离</a></li>
+<li><a href="#分库分表-sharding">分库分表 Sharding</a></li>
+</ul></li>
+<li><a href="#秒杀">秒杀</a></li>
+</ul></li>
+<li><a href="#分布式锁">分布式锁</a>
+<ul>
+<li><a href="#cas-compare-and-swap">CAS: <code>Compare-and-Swap</code></a></li>
+</ul></li>
+<li><a href="#学习金字塔">学习金字塔</a></li>
+</ul></li>
+</ul>
+</nav>
+        </div>
+        
+        
+
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.slim.min.js" integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc=" crossorigin="anonymous"></script>
+        <script>
+            (function() {
+                var $toc = $('#TableOfContents');
+                if ($toc.length > 0) {
+                    var $window = $(window);
+
+                    function onScroll(){
+                        var currentScroll = $window.scrollTop();
+                        var h = $('.article-entry h1, .article-entry h2, .article-entry h3, .article-entry h4, .article-entry h5, .article-entry h6');
+                        var id = "";
+                        h.each(function (i, e) {
+                            e = $(e);
+                            if (e.offset().top - 10 <= currentScroll) {
+                                id = e.attr('id');
+                            }
+                        });
+                        var active = $toc.find('a.active');
+                        if (active.length == 1 && active.eq(0).attr('href') == '#' + id) return true;
+
+                        active.each(function (i, e) {
+                            $(e).removeClass('active').siblings('ul').hide();
+                        });
+                        $toc.find('a[href="#' + id + '"]').parentsUntil('#TableOfContents').each(function (i, e) {
+                            $(e).children('a').addClass('active').siblings('ul').show();
+                        });
+                    }
+
+                    $window.on('scroll', onScroll);
+                    $(document).ready(function() {
+                        $toc.find('a').parent('li').find('ul').hide();
+                        onScroll();
+                        document.getElementsByClassName('article-toc')[0].style.display = '';
+                    });
+                }
+            })();
+        </script>
+        
+
+
+        
+        <footer class="article-footer">
+            <ul class="article-tag-list">
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://blog.xuh.me//tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F">分布式系统
+                    </a>
+                </li>
+                
+            </ul>
+        </footer>
+        
+    </div>
+    <nav id="article-nav">
+    
+    <a href="/posts/istio-source-code-analysis-00/" id="article-nav-newer" class="article-nav-link-wrap">
+        <div class="article-nav-title"><span>&lt;</span>&nbsp;
+            Istio源码走读-00
+        </div>
+    </a>
+    
+    
+</nav>
+
+</article>
+
+        
+            <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "jaces-blog-1" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+        
+    </section>
+    <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2019 jacexh
+            <br />
+            Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> with theme <a href="https://github.com/carsonip/hugo-theme-minos" target="_blank">Minos</a>
+        </div>
+    </div>
+    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/tomorrow-night.min.css" integrity="sha256-2wL88NKUqvJi/ExflDzkzUumjUM73mcK2gBvBBeLvTk=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js" integrity="sha256-KbfTjB0WZ8vvXngdpJGY3Yp3xKk+tttbqClO11anCIU=" crossorigin="anonymous"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    
+    <script>
+        document.getElementById('main-nav-toggle').addEventListener('click', function () {
+            var header = document.getElementById('header');
+            if (header.classList.contains('mobile-on')) {
+                header.classList.remove('mobile-on');
+            } else {
+                header.classList.add('mobile-on');
+            }
+        });
+    </script>
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,30 +1,18 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on Jace&#39;s Blog</title>
-    <link>https://blog.xuh.me/posts/</link>
-    <description>Recent content in Posts on Jace&#39;s Blog</description>
+    <title>分布式系统 on Jace&#39;s Blog</title>
+    <link>https://blog.xuh.me/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/</link>
+    <description>Recent content in 分布式系统 on Jace&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <managingEditor>jace.xh@gmail.com (jacexh)</managingEditor>
     <webMaster>jace.xh@gmail.com (jacexh)</webMaster>
     <copyright>xuh.me — All rights reserved.</copyright>
-    <lastBuildDate>Wed, 10 Apr 2019 14:06:05 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 09 Apr 2019 10:06:05 +0800</lastBuildDate>
     
-	<atom:link href="https://blog.xuh.me/posts/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://blog.xuh.me/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>Istio源码走读-00</title>
-      <link>https://blog.xuh.me/posts/istio-source-code-analysis-00/</link>
-      <pubDate>Wed, 10 Apr 2019 14:06:05 +0800</pubDate>
-      <author>jace.xh@gmail.com (jacexh)</author>
-      <guid>https://blog.xuh.me/posts/istio-source-code-analysis-00/</guid>
-      <description> 近期因为要用上istio做多测试环境的管理，为了能更清楚的了解其内部实现原理，打算花点时间来阅读下它的源码。
-Istio开发环境准备 istio的源码托管https://github.com/istio/istio上，建议clone到本地以下目录中：
-git clone git@github.com:istio/istio.git $GOPATH/src/istio.io/istio 我这边使用GoLand阅读代码，也可以使用Visual Studio Code等其他顺手的编辑器来阅读。
-Pilot模块 </description>
-    </item>
     
     <item>
       <title>分布式系统基础知识</title>
