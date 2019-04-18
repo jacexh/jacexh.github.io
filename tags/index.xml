@@ -9,7 +9,7 @@
     <managingEditor>jace.xh@gmail.com (jacexh)</managingEditor>
     <webMaster>jace.xh@gmail.com (jacexh)</webMaster>
     <copyright>xuh.me — All rights reserved.</copyright>
-    <lastBuildDate>Sat, 14 Jan 2017 21:19:00 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 29 Jul 2015 11:20:00 +0800</lastBuildDate>
     
 	<atom:link href="https://blog.xuh.me/tags/index.xml" rel="self" type="application/rss+xml" />
     
@@ -17,7 +17,7 @@
     <item>
       <title>Docker</title>
       <link>https://blog.xuh.me/tags/docker/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <pubDate>Wed, 29 Jul 2015 11:20:00 +0800</pubDate>
       <author>jace.xh@gmail.com (jacexh)</author>
       <guid>https://blog.xuh.me/tags/docker/</guid>
       <description></description>
@@ -44,7 +44,7 @@
     <item>
       <title>Locust</title>
       <link>https://blog.xuh.me/tags/locust/</link>
-      <pubDate>Mon, 20 Jul 2015 15:28:00 +0800</pubDate>
+      <pubDate>Wed, 29 Jul 2015 11:20:00 +0800</pubDate>
       <author>jace.xh@gmail.com (jacexh)</author>
       <guid>https://blog.xuh.me/tags/locust/</guid>
       <description></description>

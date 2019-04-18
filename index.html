@@ -275,6 +275,64 @@
                 
                 
                 <header class="article-header">
+                    <h1 itemprop="name"><a class="article-title" href="/posts/qa-env-docker/">使用Docker解决自动化、性能测试的外部依赖</a></h1>
+                </header>
+                
+                <div class="article-meta">
+                    <a href="/posts/qa-env-docker/" class="article-date">
+                        <time datetime='2015-07-29T11:20:00.000&#43;08:00' itemprop="datePublished">2015-07-29</time>
+                    </a>
+                    
+                    
+                    
+                    <div class="article-comment-link-wrap">
+                        <a href="/posts/qa-env-docker/#disqus_thread" class="article-comment-link">Comments</a>
+                    </div>
+                    
+                </div>
+                <div class="article-entry" itemprop="articleBody">
+                    <p>
+                        
+                    <p>笔者目前在工作中，使用Python来进行项目的自动化、性能测试，但是在不同的环境下准备Python运行环境时遇到了不少的坑，随便列举一些：</p>
+
+<h4 id="1-python版本的坑">1. Python版本的坑：</h4>
+
+<p>提到Python，最大的坑就是python2.x、python3.x共存的问题</p>
+
+<p>比如在Ubuntu下部署接口测试的执行环境时，当你用pip安装相关的package，你有时完全搞不清楚这个包是安装在python2下还是在python3下；就算包的路径安装正确了，在执行测试代码时也有可能搞错python的解析器</p>
+
+<p>大版本有坑，小版本也存在不少坑。比如在<strong>2.7.6</strong>之前的版本，用<strong>urlib3</strong>请求<strong>https</strong>的连接会出现ssl证书校验失败的问题；而当使用<strong>2.7.9</strong>这个版本时，<strong>Locust</strong>依赖的gevent对https的请求也会出现问题</p>
+                    </p>
+                    <p class="article-more-link">
+                        <a href="/posts/qa-env-docker/">Read More</a>
+                    </p>
+                </div>
+
+                
+                <footer class="article-footer">
+                    <ul class="article-tag-list">
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/docker">Docker
+                            </a>
+                        </li>
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/locust">Locust
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </footer>
+                
+            </div>
+        </article>
+        
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+            <div class="article-inner">
+                
+                
+                <header class="article-header">
                     <h1 itemprop="name"><a class="article-title" href="/posts/locust-intro/">Locust负载测试框架初探</a></h1>
                 </header>
                 
@@ -321,64 +379,6 @@
                         
                         <li class="article-tag-list-item">
                             <a class="article-tag-list-link" href="https://blog.xuh.me//tags/%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95">压力测试
-                            </a>
-                        </li>
-                        
-                    </ul>
-                </footer>
-                
-            </div>
-        </article>
-        
-        <article class="article article-type-post" itemscope itemprop="blogPost">
-            <div class="article-inner">
-                
-                
-                <header class="article-header">
-                    <h1 itemprop="name"><a class="article-title" href="/posts/qa-env-docker/">使用Docker解决自动化、性能测试的外部依赖</a></h1>
-                </header>
-                
-                <div class="article-meta">
-                    <a href="/posts/qa-env-docker/" class="article-date">
-                        <time datetime='0001-01-01T00:00:00.000&#43;00:00' itemprop="datePublished">0001-01-01</time>
-                    </a>
-                    
-                    
-                    
-                    <div class="article-comment-link-wrap">
-                        <a href="/posts/qa-env-docker/#disqus_thread" class="article-comment-link">Comments</a>
-                    </div>
-                    
-                </div>
-                <div class="article-entry" itemprop="articleBody">
-                    <p>
-                        
-                    <p>笔者目前在工作中，使用Python来进行项目的自动化、性能测试，但是在不同的环境下准备Python运行环境时遇到了不少的坑，随便列举一些：</p>
-
-<h4 id="1-python版本的坑">1. Python版本的坑：</h4>
-
-<p>提到Python，最大的坑就是python2.x、python3.x共存的问题</p>
-
-<p>比如在Ubuntu下部署接口测试的执行环境时，当你用pip安装相关的package，你有时完全搞不清楚这个包是安装在python2下还是在python3下；就算包的路径安装正确了，在执行测试代码时也有可能搞错python的解析器</p>
-
-<p>大版本有坑，小版本也存在不少坑。比如在<strong>2.7.6</strong>之前的版本，用<strong>urlib3</strong>请求<strong>https</strong>的连接会出现ssl证书校验失败的问题；而当使用<strong>2.7.9</strong>这个版本时，<strong>Locust</strong>依赖的gevent对https的请求也会出现问题</p>
-                    </p>
-                    <p class="article-more-link">
-                        <a href="/posts/qa-env-docker/">Read More</a>
-                    </p>
-                </div>
-
-                
-                <footer class="article-footer">
-                    <ul class="article-tag-list">
-                        
-                        <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/docker">Docker
-                            </a>
-                        </li>
-                        
-                        <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/locust">Locust
                             </a>
                         </li>
                         

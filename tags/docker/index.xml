@@ -9,6 +9,7 @@
     <managingEditor>jace.xh@gmail.com (jacexh)</managingEditor>
     <webMaster>jace.xh@gmail.com (jacexh)</webMaster>
     <copyright>xuh.me — All rights reserved.</copyright>
+    <lastBuildDate>Wed, 29 Jul 2015 11:20:00 +0800</lastBuildDate>
     
 	<atom:link href="https://blog.xuh.me/tags/docker/index.xml" rel="self" type="application/rss+xml" />
     
@@ -16,7 +17,7 @@
     <item>
       <title>使用Docker解决自动化、性能测试的外部依赖</title>
       <link>https://blog.xuh.me/posts/qa-env-docker/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <pubDate>Wed, 29 Jul 2015 11:20:00 +0800</pubDate>
       <author>jace.xh@gmail.com (jacexh)</author>
       <guid>https://blog.xuh.me/posts/qa-env-docker/</guid>
       <description>&lt;p&gt;笔者目前在工作中，使用Python来进行项目的自动化、性能测试，但是在不同的环境下准备Python运行环境时遇到了不少的坑，随便列举一些：&lt;/p&gt;
