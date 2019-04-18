@@ -9,21 +9,82 @@
     <managingEditor>jace.xh@gmail.com (jacexh)</managingEditor>
     <webMaster>jace.xh@gmail.com (jacexh)</webMaster>
     <copyright>xuh.me — All rights reserved.</copyright>
-    <lastBuildDate>Wed, 10 Apr 2019 14:06:05 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 15 Apr 2019 10:11:05 +0800</lastBuildDate>
     
 	<atom:link href="https://blog.xuh.me/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>Istio源码走读-00</title>
-      <link>https://blog.xuh.me/posts/istio-source-code-analysis-00/</link>
-      <pubDate>Wed, 10 Apr 2019 14:06:05 +0800</pubDate>
+      <title>在阿里云内搭建高可用的Kubernetes集群</title>
+      <link>https://blog.xuh.me/posts/create-high-availability-kubernetes-cluster-on-aliyun/</link>
+      <pubDate>Mon, 15 Apr 2019 10:11:05 +0800</pubDate>
       <author>jace.xh@gmail.com (jacexh)</author>
-      <guid>https://blog.xuh.me/posts/istio-source-code-analysis-00/</guid>
-      <description> 近期因为要用上istio做多测试环境的管理，为了能更清楚的了解其内部实现原理，打算花点时间来阅读下它的源码。
-Istio开发环境准备 istio的源码托管https://github.com/istio/istio上，建议clone到本地以下目录中：
-git clone git@github.com:istio/istio.git $GOPATH/src/istio.io/istio 我这边使用GoLand阅读代码，也可以使用Visual Studio Code等其他顺手的编辑器来阅读。
-Pilot模块 </description>
+      <guid>https://blog.xuh.me/posts/create-high-availability-kubernetes-cluster-on-aliyun/</guid>
+      <description>&lt;p&gt;[TOC]&lt;/p&gt;
+
+&lt;p&gt;本文完整地记录下了在阿里云内网构建一个高可用Kubernetes集群的过程。&lt;/p&gt;
+
+&lt;h3 id=&#34;硬件资源&#34;&gt;硬件资源&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;类型&lt;/th&gt;
+&lt;th&gt;名称&lt;/th&gt;
+&lt;th&gt;备注&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;ECS&lt;/td&gt;
+&lt;td&gt;master-001&lt;/td&gt;
+&lt;td&gt;ip: 192.168.100.1&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;ECS&lt;/td&gt;
+&lt;td&gt;master-002&lt;/td&gt;
+&lt;td&gt;ip: 192.168.100.2&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;ECS&lt;/td&gt;
+&lt;td&gt;master-003&lt;/td&gt;
+&lt;td&gt;ip: 192.168.100.3&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;ECS&lt;/td&gt;
+&lt;td&gt;worker-001&lt;/td&gt;
+&lt;td&gt;ip: 192.168.100.4&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;SLB&lt;/td&gt;
+&lt;td&gt;internal-slb&lt;/td&gt;
+&lt;td&gt;ip: 192.168.200.1  内网SLB，内网流量入口&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;SLB&lt;/td&gt;
+&lt;td&gt;public-slb&lt;/td&gt;
+&lt;td&gt;ip: 100.100.100.100 公网SLB，外网流量入口&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;ECS&lt;/td&gt;
+&lt;td&gt;haproxy-001&lt;/td&gt;
+&lt;td&gt;ip: 192.168.110.1 HAProxy集群，不部署kubernetes节点(下文详细说明)&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;ECS&lt;/td&gt;
+&lt;td&gt;haproxy-002&lt;/td&gt;
+&lt;td&gt;ip: 192.168.110.2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;</description>
     </item>
     
     <item>
