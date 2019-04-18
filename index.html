@@ -223,6 +223,58 @@
                 
                 
                 <header class="article-header">
+                    <h1 itemprop="name"><a class="article-title" href="/posts/golang-http-client-performance/">Golang Http Client性能验证</a></h1>
+                </header>
+                
+                <div class="article-meta">
+                    <a href="/posts/golang-http-client-performance/" class="article-date">
+                        <time datetime='2017-01-14T21:19:00.000&#43;08:00' itemprop="datePublished">2017-01-14</time>
+                    </a>
+                    
+                    
+                    
+                    <div class="article-comment-link-wrap">
+                        <a href="/posts/golang-http-client-performance/#disqus_thread" class="article-comment-link">Comments</a>
+                    </div>
+                    
+                </div>
+                <div class="article-entry" itemprop="articleBody">
+                    <p>
+                        
+                    <p><img src="https://image.slidesharecdn.com/embeddedsoftwarewithgolang-170224034117/95/embedded-software-with-golang-5-638.jpg?cb=1487907791" alt="golang" /></p>
+
+<p>一直很好奇golang的<code>net/http</code>的client性能如何，于是我这里做了一次验证，先上代码：</p>
+                    </p>
+                    <p class="article-more-link">
+                        <a href="/posts/golang-http-client-performance/">Read More</a>
+                    </p>
+                </div>
+
+                
+                <footer class="article-footer">
+                    <ul class="article-tag-list">
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/golang">Golang
+                            </a>
+                        </li>
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95">压力测试
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </footer>
+                
+            </div>
+        </article>
+        
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+            <div class="article-inner">
+                
+                
+                <header class="article-header">
                     <h1 itemprop="name"><a class="article-title" href="/posts/locust-intro/">Locust负载测试框架初探</a></h1>
                 </header>
                 
@@ -241,29 +293,17 @@
                 <div class="article-entry" itemprop="articleBody">
                     <p>
                         
-                    Locust是一款类似于Jmeter开源负载测试工具，所不同的是它是用python实现，并支持python脚本。 locust提供web ui界面，能够方便用户实时监控脚本运行状态。
-这里我以模拟公司OA系统登录、注销为例，简单的了解下locust的使用。
-Locust的安装 Python的安装 Windows用户可以从Python官网下载适合你系统的安装程序进行安装；在安装完成后，建议将默认安装路径C:\Python27添加到系统环境变量中，另外一并将C:\Python27\Scripts(当前该目录可能不存在)也添加进去
-Linux/Unix用户则可以略过这一步骤，系统本身已经有Python的存在，当然你如果对当前版本不满意的话，可以再自行安装熟悉的版本
-完善Python环境 setuptools setuptools, pip都是是python的包管理工具，建议安装，windows用户参照这篇文档进行安装: https://pypi.python.org/pypi/setuptools#windows-powershell-3-or-later
-pip 完成上一个步骤之后，打开cmd窗口执行下列命令安装pip:
-easy_install -U pip 这个时候就可以使用pip进行包管理了
-国内用户使用easy_install,pip安装包过慢的话，可以使用国内镜像服务器安装，如：
-pip install -i http://pypi.douban.com/simple/ -U selenium virtualenv virtualenv可以创建虚拟的python开发环境，一个专属于项目的开发环境，避免与其他环境冲突
-通过pip安装如下：
-pip install -U virtualenv 到此，一个完善的python开发环境搭建完成了
-locust安装 locust同样可以使用pip进行安装
-pip install -U locustio 然后安装pyzmq
-pip install -U pyzmq locust压力测试实战 了解OA系统登录行为 登录过程 公司OA系统的登录页面为http://oa.company.com/CasServer/login，从UI界面上看，只需要输入公司邮箱以及密码即可登录： 然而简单的猜测并不靠谱，必须要有详细的数据来佐证猜想，这里为了排查清楚登录OA系统到底post了什么的数据，可以借助第三方工具如wireshark进行抓包
-从抓包结果来看，整个登录过程的确没有想象的简单，登录时不仅向系统post了username,password两个字段，还有随机产生的lt以及execution字段
-查看网页的源代码，找到这两个字段的位置:
-也就是说，要模拟用户的登录行为，就必须从网页的源代码中抠出这两个字段的值
-注销过程 OA系统注销的过程很简单，只需要get特定的uri即可 http://oa.company.com/CasServer/logout
-locust脚本 了解整个登录、注销过程后就可以进入实质的脚本开发过程了
-提取lt execution字段值 这里我使用熟悉的xpath方式来提取这两个字段的值
-首先安装xml处理库lxml
-pip install -U lxml lt字段值的xpath表达式为:
-&#34;//div[@class=&#39;btnbox&#39;]/input[@name=&#39;lt&#39;]/@value&#34; execution字段值的xpath表达式为：
+                    <p><a href="http://locust.io/">Locust</a>是一款类似于<code>Jmeter</code>开源负载测试工具，所不同的是它是用python实现，并支持python脚本。 <code>locust</code>提供web ui界面，能够方便用户实时监控脚本运行状态。</p>
+
+<p>这里我以模拟公司OA系统登录、注销为例，简单的了解下<code>locust</code>的使用。</p>
+
+<h2 id="locust的安装">Locust的安装</h2>
+
+<h3 id="python的安装">Python的安装</h3>
+
+<p>Windows用户可以从<a href="http://python.org">Python官网</a>下载适合你系统的安装程序进行安装；在安装完成后，建议将默认安装路径<code>C:\Python27</code>添加到系统环境变量中，另外一并将<code>C:\Python27\Scripts</code>(当前该目录可能不存在)也添加进去</p>
+
+<p>Linux/Unix用户则可以略过这一步骤，系统本身已经有Python的存在，当然你如果对当前版本不满意的话，可以再自行安装熟悉的版本</p>
                     </p>
                     <p class="article-more-link">
                         <a href="/posts/locust-intro/">Read More</a>
@@ -313,21 +353,15 @@ pip install -U lxml lt字段值的xpath表达式为:
                 <div class="article-entry" itemprop="articleBody">
                     <p>
                         
-                    笔者目前在工作中，使用Python来进行项目的自动化、性能测试，但是在不同的环境下准备Python运行环境时遇到了不少的坑，随便列举一些：
-1. Python版本的坑： 提到Python，最大的坑就是python2.x、python3.x共存的问题
-比如在Ubuntu下部署接口测试的执行环境时，当你用pip安装相关的package，你有时完全搞不清楚这个包是安装在python2下还是在python3下；就算包的路径安装正确了，在执行测试代码时也有可能搞错python的解析器
-大版本有坑，小版本也存在不少坑。比如在2.7.6之前的版本，用urlib3请求https的连接会出现ssl证书校验失败的问题；而当使用2.7.9这个版本时，Locust依赖的gevent对https的请求也会出现问题
-2. Jenkins部署之坑： 在Jenkins部署时，我们用virtualenv来隔离系统侧python与任务侧的python，这样的好处就是每个任务中的python依赖都可以自定义，且不受干扰。
-但带来了另外个问题：当不同任务的依赖相同时，会重复创建多份依赖；另外，在virtualenv环境下用pip安装依赖时，也会遇到各种权限问题，这里就不展开讲了。
-3. 操作系统的坑： OS的区别其实对接口测试影响还不大，主要是影响了性能测试。
-笔者使用的Locust是基于gevent这个包，而gevent只有在linux环境下才能发挥最佳性能，所以之前笔者在OS X下发现locust产生的并发量很小主要是因为这个问题。
-Docker化自动化、性能测试的实践 首先声明，这一段不是新手教程，只是些Docker实践的记录 ：）
-1. 安装Docker Docker最佳宿主环境（可理解成你的操作系统）应该是Ubuntu，当使用这个操作系统时可以直接按照官方文档来进行： https://docs.docker.com/installation/ubuntulinux/
-而在Windows、Mac OS X下，Docker其实无法直接安装，所以目前的策略是在这两个系统下启动一个Linux虚拟机，然后将Docker安装在这个虚拟机下
-2. 构建Python运行环境 完成了Docker引擎的安装，然后开始创建一个最基础的Python运行环境
-如果直接在ubuntu下用apt-get只能安装2.7.6版本的python，而这个版本存在一定的问题，所以这里我选用了最新的2.7.10版本，尝试从源码进行编译安装
-创建名为Dockerfile的文件：
-FROM ubuntu:14.04 MAINTAINER Jace Xu &lt;jace@xuh.me&gt; ENV REFRESHED_AT 2015-06-22 ENV DEBIAN_FRONTEND noninteractive RUN echo &#34;Asia/Shanghai&#34; &gt; /etc/timezone &amp;&amp; dpkg-reconfigure -f noninteractive tzdata RUN apt-get -yqq update RUN apt-get -yqq install wget curl xz-utils build-essential zlib1g-dev RUN apt-get -yqq install libssl-dev RUN apt-get purge -yqq python.
+                    <p>笔者目前在工作中，使用Python来进行项目的自动化、性能测试，但是在不同的环境下准备Python运行环境时遇到了不少的坑，随便列举一些：</p>
+
+<h4 id="1-python版本的坑">1. Python版本的坑：</h4>
+
+<p>提到Python，最大的坑就是python2.x、python3.x共存的问题</p>
+
+<p>比如在Ubuntu下部署接口测试的执行环境时，当你用pip安装相关的package，你有时完全搞不清楚这个包是安装在python2下还是在python3下；就算包的路径安装正确了，在执行测试代码时也有可能搞错python的解析器</p>
+
+<p>大版本有坑，小版本也存在不少坑。比如在<strong>2.7.6</strong>之前的版本，用<strong>urlib3</strong>请求<strong>https</strong>的连接会出现ssl证书校验失败的问题；而当使用<strong>2.7.9</strong>这个版本时，<strong>Locust</strong>依赖的gevent对https的请求也会出现问题</p>
                     </p>
                     <p class="article-more-link">
                         <a href="/posts/qa-env-docker/">Read More</a>
