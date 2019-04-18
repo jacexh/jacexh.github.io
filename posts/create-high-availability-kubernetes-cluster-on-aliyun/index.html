@@ -300,9 +300,97 @@ sudo chown <span style="color:#66d9ef">$(</span>id -u<span style="color:#66d9ef"
 
 <h4 id="flannel网络组件">Flannel网络组件</h4>
 
+<p>为了方便，我这边使用的<code>flanner</code>作为网络组件，在<code>master</code>任意一台ECS上执行：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml</code></pre></div>
+<p>可以通过<code>kubectl get pods —all-namespaces</code>查看运行情况，如果安装成功的话，之前处于<code>Pending</code>装的<code>core-dns</code>等pod会转成<code>Running</code>状态</p>
+
 <h4 id="nginx-ingress">Nginx Ingress</h4>
 
+<p>首先安装参考<a href="https://kubernetes.github.io/ingress-nginx/">官方文档</a>安装<code>nginx-controller</code>：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/mandatory.yaml
+
+<span style="color:#75715e"># 安装ingress-nginx service</span>
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/provider/baremetal/service-nodeport.yaml</code></pre></div>
+<p>因为未使用<code>aliyun-cloud-provider</code>，<code>ingress-nginx</code>无法使用<code>Type: LoadBalancer</code>，只能选用<code>NodePort</code>的方式，另外我考虑到在公网SLB上做HTTPS转发，因此<code>ingress-nginx</code>不打算暴露443端口，所以修改<code>ingress-nginx</code>如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">apiVersion: v1
+kind: Service
+metadata:
+  name: ingress-nginx
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: <span style="color:#ae81ff">80</span>
+      targetPort: <span style="color:#ae81ff">80</span>
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx</code></pre></div>
+<p>在<code>HAProxy</code>集群上尽可能把所有节点添加上去<code>/etc/haproxy/haproxy</code>：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">listen  kubernetes-ingress-http
+        bind    <span style="color:#ae81ff">192</span>.168.110.1:80
+        mode    tcp
+        retries <span style="color:#ae81ff">3</span>
+        option  tcp-check
+        balance roundrobin
+        timeout client 900s
+        timeout server 900s
+        server  master-001 <span style="color:#ae81ff">192</span>.168.100.1:32207 check inter 2s rise <span style="color:#ae81ff">3</span> fall <span style="color:#ae81ff">2</span> downinter 5s
+        server  master-002 <span style="color:#ae81ff">192</span>.168.100.2:32207 check inter 2s rise <span style="color:#ae81ff">3</span> fall <span style="color:#ae81ff">2</span> downinter 5s
+        server  master-003 <span style="color:#ae81ff">192</span>.168.100.2:32207 check inter 2s rise <span style="color:#ae81ff">3</span> fall <span style="color:#ae81ff">2</span> downinter 5s
+        server 	worker-001 <span style="color:#ae81ff">192</span>.168.100.4:32207 check inter 2s rise <span style="color:#ae81ff">3</span> fall <span style="color:#ae81ff">2</span> downinter 5s</code></pre></div>
+<ul>
+<li>在内网SLB上打开TCP 80端口监听，指向到haproxy集群的80端口</li>
+<li>在公网SLB上打开TCP 80端口监听，指向到haproxy集群的80端口</li>
+<li>在公网SLB打开HTTPS监听，选用合适的证书，指向到haproxy集群的80端口</li>
+</ul>
+
+<p>至此，nginx安装完成，未来入站流量均会走nginx的80端口</p>
+
 <h4 id="kubernetes-dashboard">Kubernetes Dashboard</h4>
+
+<p>接下来是安装<code>Kubernetes Dashboard</code>可视化组件，不幸的是，官方还不支持<code>v1.14</code>版本，所以我这边尝试使用开发版本，请参考：<a href="https://github.com/kubernetes/dashboard/wiki/Installation">https://github.com/kubernetes/dashboard/wiki/Installation</a></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/kubernetes-dashboard-head.yaml</code></pre></div>
+<p>然后我参考<a href="https://github.com/kubernetes/dashboard/wiki/Creating-sample-user">Creating sample user</a>创建一个可登陆的<code>token</code>，接下来开始着手准备怎么从公网访问。</p>
+
+<p>创建一个ingress配置文件：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kubernetes-dashboard-ingress
+  namespace: kube-system
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: <span style="color:#e6db74">&#34;HTTPS&#34;</span>
+spec:
+  rules:
+    - host: dashboard.internal.example.com
+      http:
+        paths:
+        - backend:
+            serviceName: kubernetes-dashboard-head
+            servicePort: <span style="color:#ae81ff">443</span>
+    - host: dashboard.public.shouqianba.com
+      http:
+        paths:
+        - backend:
+            serviceName: kubernetes-dashboard-head
+            servicePort: <span style="color:#ae81ff">443</span></code></pre></div>
+<p>然后执行<code>kubectl apply -f &lt;file&gt;</code>应用ingress</p>
+
+<p>在这份配置中，监听两个域名：</p>
+
+<ul>
+<li><code>dashboar.internal.example.com</code>: 内网访问地址，你可以直接用<code>http://dashboar.internal.example.com</code></li>
+<li><code>dashboar.public.example.com</code>外网访问地址，需要通过<code>https://dashboar.public.shouqianba.com</code>访问，SSL证书的管理就交给了SLB来</li>
+</ul>
+
+<p><code>nginx.ingress.kubernetes.io/backend-protocol: &quot;HTTPS&quot;</code>这是nginx-controll注解，这个表明跟后端<code>kubernetes-dashboard-head</code>通讯时使用<code>HTTPS</code>，更多注解用法请参考：&lt;<a href="https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/">https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/</a></p>
+
+<p><strong>至此，整个Kubernetes集群搭建完成了，整个过程挺漫长，耗时耗力。</strong></p>
         </div>
 
         
