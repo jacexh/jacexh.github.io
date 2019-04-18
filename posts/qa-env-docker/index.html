@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>使用Docker解决自动化、性能测试的外部依赖 // Jace&#39;s Blog</title>
+
+        <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+        <meta property="og:title" content="使用Docker解决自动化、性能测试的外部依赖" />
+    <meta property="og:description" content="" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://blog.xuh.me/posts/qa-env-docker/" />
+    
+
+    <link href="" rel="alternate" type="application/rss+xml" title="Jace&#39;s Blog" />
+    <link rel="shortcut icon" href="/favicon.png">
+
+    <link href="https://blog.xuh.me/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+    <link href="https://blog.xuh.me/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="https://blog.xuh.me/css/style.css">
+
+    <meta name="generator" content="Hugo 0.53" />
+</head>
+
+
+<body>
+<div id="container">
+    <header id="header">
+    <div id="header-outer" class="outer">
+        <div id="header-inner" class="inner">
+            <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+            <a id="logo" class="logo-text" href="https://blog.xuh.me/">Jace&#39;s Blog</a>
+            <nav id="main-nav">
+                
+                <a class="main-nav-link" href="/">Home</a>
+                
+                <a class="main-nav-link" href="/posts">Posts</a>
+                
+                <a class="main-nav-link" href="/tags">Tags</a>
+                
+            </nav>
+            <nav id="sub-nav">
+                <div id="search-form-wrap">
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+
+    <section id="main" class="outer">
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        <header class="article-header">
+            <h1 class="article-title" itemprop="name">使用Docker解决自动化、性能测试的外部依赖</h1>
+        </header>
+        
+        <div class="article-meta">
+            <a href="/posts/qa-env-docker/" class="article-date">
+                <time datetime='0001-01-01T00:00:00.000&#43;00:00' itemprop="datePublished">0001-01-01</time>
+            </a>
+            
+            
+            
+            <div class="article-comment-link-wrap">
+                <a href="/posts/qa-env-docker/#disqus_thread" class="article-comment-link">Comments</a>
+            </div>
+            
+        </div>
+        <div class="article-entry" itemprop="articleBody">
+            
+
+<p>笔者目前在工作中，使用Python来进行项目的自动化、性能测试，但是在不同的环境下准备Python运行环境时遇到了不少的坑，随便列举一些：</p>
+
+<h4 id="1-python版本的坑">1. Python版本的坑：</h4>
+
+<p>提到Python，最大的坑就是python2.x、python3.x共存的问题</p>
+
+<p>比如在Ubuntu下部署接口测试的执行环境时，当你用pip安装相关的package，你有时完全搞不清楚这个包是安装在python2下还是在python3下；就算包的路径安装正确了，在执行测试代码时也有可能搞错python的解析器</p>
+
+<p>大版本有坑，小版本也存在不少坑。比如在<strong>2.7.6</strong>之前的版本，用<strong>urlib3</strong>请求<strong>https</strong>的连接会出现ssl证书校验失败的问题；而当使用<strong>2.7.9</strong>这个版本时，<strong>Locust</strong>依赖的gevent对https的请求也会出现问题</p>
+
+<h4 id="2-jenkins部署之坑">2. Jenkins部署之坑：</h4>
+
+<p>在Jenkins部署时，我们用virtualenv来隔离系统侧python与任务侧的python，这样的好处就是每个任务中的python依赖都可以自定义，且不受干扰。</p>
+
+<p>但带来了另外个问题：当不同任务的依赖相同时，会重复创建多份依赖；另外，在virtualenv环境下用pip安装依赖时，也会遇到各种权限问题，这里就不展开讲了。</p>
+
+<h4 id="3-操作系统的坑">3. 操作系统的坑：</h4>
+
+<p>OS的区别其实对接口测试影响还不大，主要是影响了性能测试。</p>
+
+<p>笔者使用的<strong>Locust</strong>是基于<strong>gevent</strong>这个包，而gevent只有在linux环境下才能发挥最佳性能，所以之前笔者在OS X下发现locust产生的并发量很小主要是因为这个问题。</p>
+
+<h3 id="docker化自动化-性能测试的实践">Docker化自动化、性能测试的实践</h3>
+
+<p><strong>首先声明，这一段不是新手教程，只是些Docker实践的记录 ：）</strong></p>
+
+<h4 id="1-安装docker">1. 安装Docker</h4>
+
+<p>Docker最佳宿主环境（可理解成你的操作系统）应该是Ubuntu，当使用这个操作系统时可以直接按照官方文档来进行： <code>https://docs.docker.com/installation/ubuntulinux/</code></p>
+
+<p>而在Windows、Mac OS X下，Docker其实无法直接安装，所以目前的策略是在这两个系统下启动一个Linux虚拟机，然后将Docker安装在这个虚拟机下</p>
+
+<h4 id="2-构建python运行环境">2. 构建Python运行环境</h4>
+
+<p>完成了Docker引擎的安装，然后开始创建一个最基础的Python运行环境</p>
+
+<p>如果直接在ubuntu下用apt-get只能安装2.7.6版本的python，而这个版本存在一定的问题，所以这里我选用了最新的2.7.10版本，尝试从源码进行编译安装</p>
+
+<p>创建名为<code>Dockerfile</code>的文件：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">FROM ubuntu:14.04
+
+MAINTAINER Jace Xu &lt;jace@xuh.me&gt;
+ENV REFRESHED_AT 2015-06-22
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN echo &#34;Asia/Shanghai&#34; &gt; /etc/timezone &amp;&amp; dpkg-reconfigure -f noninteractive tzdata
+
+RUN apt-get -yqq update
+RUN apt-get -yqq install wget curl xz-utils build-essential zlib1g-dev
+RUN apt-get -yqq install libssl-dev
+RUN apt-get purge -yqq python.*
+ENV LANG C.UTF-8
+RUN gpg --keyserver ha.pool.sks-keyservers.net --recv-keys C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF
+ENV PYTHON_VERSION 2.7.10
+
+RUN set -x \
+    &amp;&amp; mkdir -p /usr/src/python \
+    &amp;&amp; curl -SL &#34;https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tar.xz&#34; -o python.tar.xz \
+    &amp;&amp; curl -SL &#34;https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tar.xz.asc&#34; -o python.tar.xz.asc \
+    &amp;&amp; gpg --verify python.tar.xz.asc \
+    &amp;&amp; tar -xJC /usr/src/python --strip-components=1 -f python.tar.xz \
+    &amp;&amp; rm python.tar.xz* \
+    &amp;&amp; cd /usr/src/python \
+    &amp;&amp; ./configure --enable-shared --enable-unicode=ucs4 \
+    &amp;&amp; make -j$(nproc) \
+    &amp;&amp; make install \
+    &amp;&amp; ldconfig \
+    &amp;&amp; curl -SL &#39;https://bootstrap.pypa.io/get-pip.py&#39; | python2 \
+    &amp;&amp; pip install --no-cache-dir --upgrade pip \
+    &amp;&amp; find /usr/local \
+        \( -type d -a -name test -o -name tests \) \
+        -o \( -type f -a -name &#39;*.pyc&#39; -o -name &#39;*.pyo&#39; \) \
+        -exec rm -rf &#39;{}&#39; + \
+    &amp;&amp; rm -rf /usr/src/python
+
+CMD [&#34;python2&#34;]</pre></div>
+<p>Dockerfile其实跟shell脚本非常像，可以非常快速的理解</p>
+
+<p>根据该Dockerfile构建一个镜像：</p>
+
+<p><code>docker build -t=&quot;jacexh/python:2.7.10&quot; .</code></p>
+
+<p>请注意，上条指令最后有一个句点</p>
+
+<p>这里我使用<code>-t</code>这个参数，给构建的镜像打了一个tag，解释下：</p>
+
+<ul>
+<li><strong>jacexh</strong>: 我在docker hub注册的帐号（可类比成git，这里即为github、gitlab的帐号）</li>
+<li><strong>python</strong>: docker hub上Repository名字（比如gitlab上shouqianba）</li>
+<li><strong>2.7.10</strong>: 这个repository的标签（git的标签/分支均可）</li>
+</ul>
+
+<p>所以，可以在docker hub上看到这个公开的镜像： <code>https://registry.hub.docker.com/u/jacexh/python/</code></p>
+
+<p>如果不想自己构建镜像，你可以直接用我发布的镜像：</p>
+
+<p><code>docker pull jacexh/python:2.7.10</code></p>
+
+<blockquote>
+<p>docker hub的使用是不是跟git很像？</p>
+</blockquote>
+
+<h4 id="3-构建适用于接口测试的镜像">3. 构建适用于接口测试的镜像</h4>
+
+<p>这里再创建一个Dockerfile：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">FROM jacexh/python:2.7.10
+
+MAINTAINER Jace Xu &lt;jace@xuh.me&gt;
+ENV REFRESHED_AT 2015-06-22
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get -yqq update
+
+# 安装依赖
+RUN apt-get install -yqq libffi-dev libzmq-dev libevent-dev libfreetype6-dev libxft-dev
+RUN pip install -U requests simplejson xmlrunner paramiko locustio pyzmq mock redis pymongo==2.8
+RUN pip install -U matplotlib numpy
+RUN pip install -U selenium
+RUN wget -qO- https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.8-linux-x86_64.tar.bz2 | tar jxv -C /opt
+RUN ln -sf /opt/phantomjs-1.9.8-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs
+
+EXPOSE 8089
+mkdir -p /opt/workspace
+WORKDIR /opt/workspace
+ENTRYPOINT [&#34;python&#34;]</pre></div>
+<p>然后用build命令构建该镜像：</p>
+
+<p><code>docker build -t=&quot;jacexh/testing&quot; .</code></p>
+
+<p>如果不想自己构建的化，直接下载docker hub上的镜像：</p>
+
+<p><code>docker pull jacexh/testing</code></p>
+
+<p>事实上：当你安装完docker后，直接执行上面一条命令即可，完全不用理会<strong>Step 2</strong></p>
+
+<h4 id="4-使用docker镜像">4. 使用Docker镜像</h4>
+
+<p>上面提供的testing镜像只含有执行我们接口测试的python依赖，不含有我们的测试代码，因此我们需要把本地的代码挂载上去执行：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">docker run -i -t --volume $PATH_SOURCECODE:/opt/workspace jacexh/testing runsuite.py</pre></div>
+<ul>
+<li><strong>&ndash;volume</strong>: 将宿主环境的测试代码目录挂载到容器的<code>/opt/workspace</code>路径</li>
+<li><strong>runsuite.py</strong>： 自动化测试入口文件</li>
+</ul>
+
+<h4 id="5-docker化对selenium的影响">5. Docker化对Selenium的影响</h4>
+
+<p>笔者的Web UI自动化测试项目中的selenium主要使用firefox作为web容器，而firefox又无法在cli环境下运行，因此我在这个镜像中使用PhantomJS作为替代，有用到selenium的代码应该做出一些改动：</p>
+
+<p>像下面的代码：
+<code>driver = webdriver.Firefox()</code>
+需要改成：
+<code>driver = webdriver.PhantomJS()</code></p>
+
+<p>另外PhantomJS解析出来的WebElement表达式与Firefox可能会有区别，这个在开发Web自动化测试的时候需要注意</p>
+
+        </div>
+
+        
+        
+        <div class="article-toc" style="display:none;">
+            <h3>Contents</h3>
+            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#1-python版本的坑">1. Python版本的坑：</a></li>
+<li><a href="#2-jenkins部署之坑">2. Jenkins部署之坑：</a></li>
+<li><a href="#3-操作系统的坑">3. 操作系统的坑：</a></li>
+</ul></li>
+<li><a href="#docker化自动化-性能测试的实践">Docker化自动化、性能测试的实践</a>
+<ul>
+<li><a href="#1-安装docker">1. 安装Docker</a></li>
+<li><a href="#2-构建python运行环境">2. 构建Python运行环境</a></li>
+<li><a href="#3-构建适用于接口测试的镜像">3. 构建适用于接口测试的镜像</a></li>
+<li><a href="#4-使用docker镜像">4. 使用Docker镜像</a></li>
+<li><a href="#5-docker化对selenium的影响">5. Docker化对Selenium的影响</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+        </div>
+        
+        
+
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.slim.min.js" integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc=" crossorigin="anonymous"></script>
+        <script>
+            (function() {
+                var $toc = $('#TableOfContents');
+                if ($toc.length > 0) {
+                    var $window = $(window);
+
+                    function onScroll(){
+                        var currentScroll = $window.scrollTop();
+                        var h = $('.article-entry h1, .article-entry h2, .article-entry h3, .article-entry h4, .article-entry h5, .article-entry h6');
+                        var id = "";
+                        h.each(function (i, e) {
+                            e = $(e);
+                            if (e.offset().top - 10 <= currentScroll) {
+                                id = e.attr('id');
+                            }
+                        });
+                        var active = $toc.find('a.active');
+                        if (active.length == 1 && active.eq(0).attr('href') == '#' + id) return true;
+
+                        active.each(function (i, e) {
+                            $(e).removeClass('active').siblings('ul').hide();
+                        });
+                        $toc.find('a[href="#' + id + '"]').parentsUntil('#TableOfContents').each(function (i, e) {
+                            $(e).children('a').addClass('active').siblings('ul').show();
+                        });
+                    }
+
+                    $window.on('scroll', onScroll);
+                    $(document).ready(function() {
+                        $toc.find('a').parent('li').find('ul').hide();
+                        onScroll();
+                        document.getElementsByClassName('article-toc')[0].style.display = '';
+                    });
+                }
+            })();
+        </script>
+        
+
+
+        
+        <footer class="article-footer">
+            <ul class="article-tag-list">
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://blog.xuh.me//tags/docker">Docker
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://blog.xuh.me//tags/locust">Locust
+                    </a>
+                </li>
+                
+            </ul>
+        </footer>
+        
+    </div>
+    <nav id="article-nav">
+    
+    <a href="/posts/locust-intro/" id="article-nav-newer" class="article-nav-link-wrap">
+        <div class="article-nav-title"><span>&lt;</span>&nbsp;
+            Locust负载测试框架初探
+        </div>
+    </a>
+    
+    
+</nav>
+
+</article>
+
+        
+            <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "jaces-blog-1" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+        
+    </section>
+    <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2019 jacexh
+            <br />
+            Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> with theme <a href="https://github.com/carsonip/hugo-theme-minos" target="_blank">Minos</a>
+        </div>
+    </div>
+    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/tomorrow-night.min.css" integrity="sha256-2wL88NKUqvJi/ExflDzkzUumjUM73mcK2gBvBBeLvTk=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js" integrity="sha256-KbfTjB0WZ8vvXngdpJGY3Yp3xKk+tttbqClO11anCIU=" crossorigin="anonymous"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    
+    <script>
+        document.getElementById('main-nav-toggle').addEventListener('click', function () {
+            var header = document.getElementById('header');
+            if (header.classList.contains('mobile-on')) {
+                header.classList.remove('mobile-on');
+            } else {
+                header.classList.add('mobile-on');
+            }
+        });
+    </script>
+</footer>
+
+</div>
+</body>
+</html>

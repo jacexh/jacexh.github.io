@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Docker on Jace&#39;s Blog</title>
+    <link>https://blog.xuh.me/tags/docker/</link>
+    <description>Recent content in Docker on Jace&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <managingEditor>jace.xh@gmail.com (jacexh)</managingEditor>
+    <webMaster>jace.xh@gmail.com (jacexh)</webMaster>
+    <copyright>xuh.me — All rights reserved.</copyright>
+    
+	<atom:link href="https://blog.xuh.me/tags/docker/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>使用Docker解决自动化、性能测试的外部依赖</title>
+      <link>https://blog.xuh.me/posts/qa-env-docker/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <author>jace.xh@gmail.com (jacexh)</author>
+      <guid>https://blog.xuh.me/posts/qa-env-docker/</guid>
+      <description>笔者目前在工作中，使用Python来进行项目的自动化、性能测试，但是在不同的环境下准备Python运行环境时遇到了不少的坑，随便列举一些：
+1. Python版本的坑： 提到Python，最大的坑就是python2.x、python3.x共存的问题
+比如在Ubuntu下部署接口测试的执行环境时，当你用pip安装相关的package，你有时完全搞不清楚这个包是安装在python2下还是在python3下；就算包的路径安装正确了，在执行测试代码时也有可能搞错python的解析器
+大版本有坑，小版本也存在不少坑。比如在2.7.6之前的版本，用urlib3请求https的连接会出现ssl证书校验失败的问题；而当使用2.7.9这个版本时，Locust依赖的gevent对https的请求也会出现问题
+2. Jenkins部署之坑： 在Jenkins部署时，我们用virtualenv来隔离系统侧python与任务侧的python，这样的好处就是每个任务中的python依赖都可以自定义，且不受干扰。
+但带来了另外个问题：当不同任务的依赖相同时，会重复创建多份依赖；另外，在virtualenv环境下用pip安装依赖时，也会遇到各种权限问题，这里就不展开讲了。
+3. 操作系统的坑： OS的区别其实对接口测试影响还不大，主要是影响了性能测试。
+笔者使用的Locust是基于gevent这个包，而gevent只有在linux环境下才能发挥最佳性能，所以之前笔者在OS X下发现locust产生的并发量很小主要是因为这个问题。
+Docker化自动化、性能测试的实践 首先声明，这一段不是新手教程，只是些Docker实践的记录 ：）
+1. 安装Docker Docker最佳宿主环境（可理解成你的操作系统）应该是Ubuntu，当使用这个操作系统时可以直接按照官方文档来进行： https://docs.docker.com/installation/ubuntulinux/
+而在Windows、Mac OS X下，Docker其实无法直接安装，所以目前的策略是在这两个系统下启动一个Linux虚拟机，然后将Docker安装在这个虚拟机下
+2. 构建Python运行环境 完成了Docker引擎的安装，然后开始创建一个最基础的Python运行环境
+如果直接在ubuntu下用apt-get只能安装2.7.6版本的python，而这个版本存在一定的问题，所以这里我选用了最新的2.7.10版本，尝试从源码进行编译安装
+创建名为Dockerfile的文件：
+FROM ubuntu:14.04 MAINTAINER Jace Xu &amp;lt;jace@xuh.me&amp;gt; ENV REFRESHED_AT 2015-06-22 ENV DEBIAN_FRONTEND noninteractive RUN echo &amp;#34;Asia/Shanghai&amp;#34; &amp;gt; /etc/timezone &amp;amp;&amp;amp; dpkg-reconfigure -f noninteractive tzdata RUN apt-get -yqq update RUN apt-get -yqq install wget curl xz-utils build-essential zlib1g-dev RUN apt-get -yqq install libssl-dev RUN apt-get purge -yqq python.</description>
+    </item>
+    
+  </channel>
+</rss>

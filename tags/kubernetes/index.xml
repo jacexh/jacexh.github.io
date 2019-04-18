@@ -20,9 +20,7 @@
       <pubDate>Mon, 15 Apr 2019 10:11:05 +0800</pubDate>
       <author>jace.xh@gmail.com (jacexh)</author>
       <guid>https://blog.xuh.me/posts/create-high-availability-kubernetes-cluster-on-aliyun/</guid>
-      <description>&lt;p&gt;[TOC]&lt;/p&gt;
-
-&lt;p&gt;本文完整地记录下了在阿里云内网构建一个高可用Kubernetes集群的过程。&lt;/p&gt;
+      <description>&lt;p&gt;本文完整地记录下了在阿里云内网构建一个高可用Kubernetes集群的过程。&lt;/p&gt;
 
 &lt;h3 id=&#34;硬件资源&#34;&gt;硬件资源&lt;/h3&gt;
 
