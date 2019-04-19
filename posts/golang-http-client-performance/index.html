@@ -178,7 +178,7 @@
 	<span style="color:#a6e22e">wg</span>.<span style="color:#a6e22e">Wait</span>()
 }</code></pre></div>
 <p>服务端实现：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
 
 <span style="color:#f92672">import</span> (
     <span style="color:#e6db74">&#34;fmt&#34;</span>
@@ -193,17 +193,17 @@
     <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ListenAndServe</span>(<span style="color:#e6db74">&#34;:8080&#34;</span>, <span style="color:#66d9ef">nil</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
         <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#e6db74">&#34;ListenAndServe: &#34;</span>, <span style="color:#a6e22e">err</span>)
     }
-}</pre></div>
+}</code></pre></div>
 <p>使用<code>wrt</code>压测的结果：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">./wrk/wrk -t20 -c400 -d30s http://alpha-001:8080/
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./wrk/wrk -t20 -c400 -d30s http://alpha-001:8080/
 Running 30s test @ http://alpha-001:8080/
-  20 threads and 400 connections
+  <span style="color:#ae81ff">20</span> threads and <span style="color:#ae81ff">400</span> connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency     7.40ms    5.50ms 222.14ms   96.11%
-    Req/Sec     2.81k   496.11     7.18k    89.50%
-  1676604 requests in 30.04s, 193.47MB read
-Requests/sec:  55818.62
-Transfer/sec:      6.44MB</pre></div>
+    Latency     <span style="color:#ae81ff">7</span>.40ms    <span style="color:#ae81ff">5</span>.50ms <span style="color:#ae81ff">222</span>.14ms   <span style="color:#ae81ff">96</span>.11%
+    Req/Sec     <span style="color:#ae81ff">2</span>.81k   <span style="color:#ae81ff">496</span>.11     <span style="color:#ae81ff">7</span>.18k    <span style="color:#ae81ff">89</span>.50%
+  <span style="color:#ae81ff">1676604</span> requests in <span style="color:#ae81ff">30</span>.04s, <span style="color:#ae81ff">193</span>.47MB read
+Requests/sec:  <span style="color:#ae81ff">55818</span>.62
+Transfer/sec:      <span style="color:#ae81ff">6</span>.44MB</code></pre></div>
         </div>
 
         
