@@ -9,14 +9,64 @@
     <managingEditor>jace.xh@gmail.com (jacexh)</managingEditor>
     <webMaster>jace.xh@gmail.com (jacexh)</webMaster>
     <copyright>xuh.me — All rights reserved.</copyright>
+    <lastBuildDate>Tue, 29 May 2018 09:01:07 +0800</lastBuildDate>
     
 	<atom:link href="https://blog.xuh.me/tags/python/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>Python接口测试实战3 - 接口封装的基石：requests.Session</title>
+      <link>https://blog.xuh.me/posts/api-testing-003/</link>
+      <pubDate>Tue, 29 May 2018 09:01:07 +0800</pubDate>
+      <author>jace.xh@gmail.com (jacexh)</author>
+      <guid>https://blog.xuh.me/posts/api-testing-003/</guid>
+      <description>笔者在面试候选人的时候，如果恰巧对方使用过requests库，一般会问一个问题：谈一下你对requests.Session对象的理解？
+一个很简单的问题，但印象中几乎没有候选人回答上来过，而且很多人在使用requests做接口测试，但居然不知道Session这个对象，这让我有点匪夷所思。
+难道一般的接口测试中用不到这个对象？非也，让我们配合着源码来看这段简单的代码： requests.get(&amp;quot;http://www.baidu.com&amp;quot;)
+def get(url, params=None, **kwargs): r&amp;#34;&amp;#34;&amp;#34;Sends a GET request. ... &amp;#34;&amp;#34;&amp;#34; return request(&amp;#39;get&amp;#39;, url, params=params, **kwargs) 然后再翻查下requests.requst这个函数：
+def request(method, url, **kwargs): &amp;#34;&amp;#34;&amp;#34;Constructs and sends a :class:`Request &amp;lt;Request&amp;gt;`. ... &amp;#34;&amp;#34;&amp;#34; with sessions.Session() as session: return session.request(method=method, url=url, **kwargs) 可以看到调用requests.request实际是实例化一个Session对象，而后销毁；Session.request才是真正发起请求的方法。
+我们看下官方对requests.Session的介绍：
+ The Session object allows you to persist certain parameters across requests. It also persists cookies across all requests made from the Session instance, and will use urllib3’s connection pooling.</description>
+    </item>
+    
+    <item>
+      <title>Python接口测试实战02 - 接口测试的本质</title>
+      <link>https://blog.xuh.me/posts/api-testing-002/</link>
+      <pubDate>Sun, 20 May 2018 08:53:34 +0800</pubDate>
+      <author>jace.xh@gmail.com (jacexh)</author>
+      <guid>https://blog.xuh.me/posts/api-testing-002/</guid>
+      <description>在上一篇简单的介绍了接口测试里用到的工具、类库后，本篇正式开始讲用Python进行接口测试实战。
+1. 从一个登录接口了解接口调用的方法 现在假设有一个登录接口POST /api/login，该接口有两个入参username和password，分别表示帐号的用户名以及密码，那该如何调用该接口呢？
+以下该登录接口都以一个临时的url:http://requestbin.qahub.net/z3m6v8z3来替代
+1.1 curl做接口调用： 先用curl来做一个简单的例子：
+&amp;gt;&amp;gt; curl -X POST -d &amp;#34;username=foo&amp;amp;password=bar%21&amp;#34; http://requestbin.qahub.net/z3m6v8z3 ok 在http://requestbin.qahub.net/z3m6v8z3?inspect上查看下本次请求的报文：
+1.2 Postman调用接口： 然后用Postman调用同一个接口：
+再在页面上查看下本次请求的详情：
+Body部分完全一致，只不过请求头里添加了一堆额外的信息，但并不影响。
+1.3 requests调用接口： 最后用python+requests这种方式来调用该接口：
+同样也要在web页面上确认下请求报文：
+2. 事实永远不可能如此简单： 在这个需求中，从上面三种调用方式来看的话，显然Postman是最简单的。
+然而，现实场景中的登录接口怎么可能如此简单？
+2.1 如果请求报文是json格式： 现在json格式的请求报文可能更加的流行，所以如果要将该接口改成json要怎么办？（*curl以下略过不讲了*）
+先看下Postman:
+嗯没错，要裸写json字符串，千万要注意格式：别多了个逗号、少了个花括号什么的
+再对比下使用requests
+效果也达到了，但好像也不是很简单？ 那么再看看直接利用json这个参数来实现：
+这样来好像是比Postman简单了一些？
+2.2 你居然用明文传输密码？ 我觉得上面举个里很差的栗子，如果服务端真的这么实现这个接口，客户不找你拼命才怪，所以我再完善下需求：该接口接收的password字段需要md5加密后传入。
+然后我又打开了Postman:
+突然不知道该怎么进行了。。。（*实际可以利用Postman的脚本机制完成md5的计算*）
+还是用我擅长的requests来解决吧：
+import requests import hashlib def md5(content, encoding=&amp;#34;utf-8&amp;#34;): m = hashlib.md5() m.update(content.encode(encoding)) return m.hexdigest() requests.post(&amp;#34;http://requestbin.qahub.net/z3m6v8z3&amp;#34;, json=dict(username=&amp;#34;foo&amp;#34;, password=md5(&amp;#34;bar!&amp;#34;))) 正当笔者对解决了md5加密问题感到欣喜的时候，
+开发小哥跑过来了：『md5加密太不安全了，要加盐或者换成AES、DES，甚至接入OAuth』
+我：fxxk
+3. 接口测试的本质 3.1 别忘了功能测试： 我们先看下一个传统的web登录控件，一个用户名输入框、一个密码输入框以及一个登录按钮：</description>
+    </item>
+    
+    <item>
       <title>Python接口测试实战01：七种武器</title>
       <link>https://blog.xuh.me/posts/api-testing-001/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 19 May 2018 08:42:22 +0800</pubDate>
       <author>jace.xh@gmail.com (jacexh)</author>
       <guid>https://blog.xuh.me/posts/api-testing-001/</guid>
       <description>&lt;p&gt;[TOC]&lt;/p&gt;

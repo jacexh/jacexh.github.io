@@ -58,38 +58,30 @@
                 
                 
                 <header class="article-header">
-                    <h1 itemprop="name"><a class="article-title" href="/posts/api-testing-001/">Python接口测试实战01：七种武器</a></h1>
+                    <h1 itemprop="name"><a class="article-title" href="/posts/golang-http-client-performance/">Golang Http Client性能验证</a></h1>
                 </header>
                 
                 <div class="article-meta">
-                    <a href="/posts/api-testing-001/" class="article-date">
-                        <time datetime='0001-01-01T00:00:00.000&#43;00:00' itemprop="datePublished">0001-01-01</time>
+                    <a href="/posts/golang-http-client-performance/" class="article-date">
+                        <time datetime='2017-01-14T21:19:00.000&#43;08:00' itemprop="datePublished">2017-01-14</time>
                     </a>
                     
                     
                     
                     <div class="article-comment-link-wrap">
-                        <a href="/posts/api-testing-001/#disqus_thread" class="article-comment-link">Comments</a>
+                        <a href="/posts/golang-http-client-performance/#disqus_thread" class="article-comment-link">Comments</a>
                     </div>
                     
                 </div>
                 <div class="article-entry" itemprop="articleBody">
                     <p>
                         
-                    <p>[TOC]</p>
+                    <p><img src="https://image.slidesharecdn.com/embeddedsoftwarewithgolang-170224034117/95/embedded-software-with-golang-5-638.jpg?cb=1487907791" alt="golang" /></p>
 
-<p>工欲善其事必先利其器，在正式开始介绍使用Python做接口测试前，我们先准备好相应的工具，这样就能快速上手接口测试了。</p>
-
-<h3 id="0-python">0. Python</h3>
-
-<p>在测试领域Python其实大有可为，不管是Web、移动端、接口、嵌入式测试都能看到Python的身影。而且因为Python语法的简单性，用Python做自动化测试的效率极高。</p>
-
-<p>有人可能会说：<strong>Python运行效率低啊。</strong>可是你想想，在自动化测试应用时，我们需要在乎底层脚本语言的运行效率吗？与其在乎运行效率，还不如思考下如何快速提高自动化测试的覆盖率，也就是自动化case的开发效率。</p>
-
-<p>Python有Python2以及Python3两个大版本，Python2行将就木，本系列文章都以Python3为基础，而且有可能会使用到Python3.5以上版本的特性。</p>
+<p>一直很好奇golang的<code>net/http</code>的client性能如何，于是我这里做了一次验证，先上代码：</p>
                     </p>
                     <p class="article-more-link">
-                        <a href="/posts/api-testing-001/">Read More</a>
+                        <a href="/posts/golang-http-client-performance/">Read More</a>
                     </p>
                 </div>
 
@@ -98,12 +90,130 @@
                     <ul class="article-tag-list">
                         
                         <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/python">Python
+                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/golang">Golang
                             </a>
                         </li>
                         
                         <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/%E6%8E%A5%E5%8F%A3%E6%B5%8B%E8%AF%95">接口测试
+                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95">压力测试
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </footer>
+                
+            </div>
+        </article>
+        
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+            <div class="article-inner">
+                
+                
+                <header class="article-header">
+                    <h1 itemprop="name"><a class="article-title" href="/posts/qa-env-docker/">使用Docker解决自动化、性能测试的外部依赖</a></h1>
+                </header>
+                
+                <div class="article-meta">
+                    <a href="/posts/qa-env-docker/" class="article-date">
+                        <time datetime='2015-07-29T11:20:00.000&#43;08:00' itemprop="datePublished">2015-07-29</time>
+                    </a>
+                    
+                    
+                    
+                    <div class="article-comment-link-wrap">
+                        <a href="/posts/qa-env-docker/#disqus_thread" class="article-comment-link">Comments</a>
+                    </div>
+                    
+                </div>
+                <div class="article-entry" itemprop="articleBody">
+                    <p>
+                        
+                    <p>笔者目前在工作中，使用Python来进行项目的自动化、性能测试，但是在不同的环境下准备Python运行环境时遇到了不少的坑，随便列举一些：</p>
+
+<h4 id="1-python版本的坑">1. Python版本的坑：</h4>
+
+<p>提到Python，最大的坑就是python2.x、python3.x共存的问题</p>
+
+<p>比如在Ubuntu下部署接口测试的执行环境时，当你用pip安装相关的package，你有时完全搞不清楚这个包是安装在python2下还是在python3下；就算包的路径安装正确了，在执行测试代码时也有可能搞错python的解析器</p>
+
+<p>大版本有坑，小版本也存在不少坑。比如在<strong>2.7.6</strong>之前的版本，用<strong>urlib3</strong>请求<strong>https</strong>的连接会出现ssl证书校验失败的问题；而当使用<strong>2.7.9</strong>这个版本时，<strong>Locust</strong>依赖的gevent对https的请求也会出现问题</p>
+                    </p>
+                    <p class="article-more-link">
+                        <a href="/posts/qa-env-docker/">Read More</a>
+                    </p>
+                </div>
+
+                
+                <footer class="article-footer">
+                    <ul class="article-tag-list">
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/docker">Docker
+                            </a>
+                        </li>
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/locust">Locust
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </footer>
+                
+            </div>
+        </article>
+        
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+            <div class="article-inner">
+                
+                
+                <header class="article-header">
+                    <h1 itemprop="name"><a class="article-title" href="/posts/locust-intro/">Locust负载测试框架初探</a></h1>
+                </header>
+                
+                <div class="article-meta">
+                    <a href="/posts/locust-intro/" class="article-date">
+                        <time datetime='2015-07-20T15:28:00.000&#43;08:00' itemprop="datePublished">2015-07-20</time>
+                    </a>
+                    
+                    
+                    
+                    <div class="article-comment-link-wrap">
+                        <a href="/posts/locust-intro/#disqus_thread" class="article-comment-link">Comments</a>
+                    </div>
+                    
+                </div>
+                <div class="article-entry" itemprop="articleBody">
+                    <p>
+                        
+                    <p><a href="http://locust.io/">Locust</a>是一款类似于<code>Jmeter</code>开源负载测试工具，所不同的是它是用python实现，并支持python脚本。 <code>locust</code>提供web ui界面，能够方便用户实时监控脚本运行状态。</p>
+
+<p>这里我以模拟公司OA系统登录、注销为例，简单的了解下<code>locust</code>的使用。</p>
+
+<h2 id="locust的安装">Locust的安装</h2>
+
+<h3 id="python的安装">Python的安装</h3>
+
+<p>Windows用户可以从<a href="http://python.org">Python官网</a>下载适合你系统的安装程序进行安装；在安装完成后，建议将默认安装路径<code>C:\Python27</code>添加到系统环境变量中，另外一并将<code>C:\Python27\Scripts</code>(当前该目录可能不存在)也添加进去</p>
+
+<p>Linux/Unix用户则可以略过这一步骤，系统本身已经有Python的存在，当然你如果对当前版本不满意的话，可以再自行安装熟悉的版本</p>
+                    </p>
+                    <p class="article-more-link">
+                        <a href="/posts/locust-intro/">Read More</a>
+                    </p>
+                </div>
+
+                
+                <footer class="article-footer">
+                    <ul class="article-tag-list">
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/locust">Locust
+                            </a>
+                        </li>
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95">压力测试
                             </a>
                         </li>
                         

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Python接口测试实战01：七种武器 // Jace&#39;s Blog</title>
+    <title>Python接口测试实战3 - 接口封装的基石：requests.Session // Jace&#39;s Blog</title>
 
         <meta charset="utf-8">
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
@@ -9,11 +9,11 @@
     <meta name="description" content="">
     <meta name="keywords" content="">
     <meta name="author" content="">
-        <meta property="og:title" content="Python接口测试实战01：七种武器" />
+        <meta property="og:title" content="Python接口测试实战3 - 接口封装的基石：requests.Session" />
     <meta property="og:description" content="" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="en_US" />
-    <meta property="og:url" content="https://blog.xuh.me/posts/api-testing-001/" />
+    <meta property="og:url" content="https://blog.xuh.me/posts/api-testing-003/" />
     
 
     <link href="" rel="alternate" type="application/rss+xml" title="Jace&#39;s Blog" />
@@ -57,136 +57,73 @@
     <div class="article-inner">
         
         <header class="article-header">
-            <h1 class="article-title" itemprop="name">Python接口测试实战01：七种武器</h1>
+            <h1 class="article-title" itemprop="name">Python接口测试实战3 - 接口封装的基石：requests.Session</h1>
         </header>
         
         <div class="article-meta">
-            <a href="/posts/api-testing-001/" class="article-date">
-                <time datetime='2018-05-19T08:42:22.000&#43;08:00' itemprop="datePublished">2018-05-19</time>
+            <a href="/posts/api-testing-003/" class="article-date">
+                <time datetime='2018-05-29T09:01:07.000&#43;08:00' itemprop="datePublished">2018-05-29</time>
             </a>
             
             
             
             <div class="article-comment-link-wrap">
-                <a href="/posts/api-testing-001/#disqus_thread" class="article-comment-link">Comments</a>
+                <a href="/posts/api-testing-003/#disqus_thread" class="article-comment-link">Comments</a>
             </div>
             
         </div>
         <div class="article-entry" itemprop="articleBody">
-            <p>[TOC]</p>
+            <p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20190419090155.png" alt="" /></p>
 
-<p>工欲善其事必先利其器，在正式开始介绍使用Python做接口测试前，我们先准备好相应的工具，这样就能快速上手接口测试了。</p>
+<p>笔者在面试候选人的时候，如果恰巧对方使用过<code>requests</code>库，一般会问一个问题：谈一下你对<code>requests.Session</code>对象的理解？</p>
 
-<h3 id="0-python">0. Python</h3>
+<p>一个很简单的问题，但印象中几乎没有候选人回答上来过，而且很多人在使用<code>requests</code>做接口测试，但居然不知道<code>Session</code>这个对象，这让我有点匪夷所思。</p>
 
-<p>在测试领域Python其实大有可为，不管是Web、移动端、接口、嵌入式测试都能看到Python的身影。而且因为Python语法的简单性，用Python做自动化测试的效率极高。</p>
+<p>难道一般的接口测试中用不到这个对象？非也，让我们配合着源码来看这段简单的代码： <code>requests.get(&quot;http://www.baidu.com&quot;)</code></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get</span>(url, params<span style="color:#f92672">=</span>None, <span style="color:#f92672">**</span>kwargs):
+    <span style="color:#e6db74">r</span><span style="color:#e6db74">&#34;&#34;&#34;Sends a GET request.
+</span><span style="color:#e6db74">    ...
+</span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+    <span style="color:#66d9ef">return</span> request(<span style="color:#e6db74">&#39;get&#39;</span>, url, params<span style="color:#f92672">=</span>params, <span style="color:#f92672">**</span>kwargs)</code></pre></div>
+<p>然后再翻查下<code>requests.requst</code>这个函数：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">request</span>(method, url, <span style="color:#f92672">**</span>kwargs):
+    <span style="color:#e6db74">&#34;&#34;&#34;Constructs and sends a :class:`Request &lt;Request&gt;`.
+</span><span style="color:#e6db74">    ...
+</span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+    <span style="color:#66d9ef">with</span> sessions<span style="color:#f92672">.</span>Session() <span style="color:#66d9ef">as</span> session:
+        <span style="color:#66d9ef">return</span> session<span style="color:#f92672">.</span>request(method<span style="color:#f92672">=</span>method, url<span style="color:#f92672">=</span>url, <span style="color:#f92672">**</span>kwargs)</code></pre></div>
+<p><strong>可以看到调用requests.request实际是实例化一个Session对象，而后销毁；Session.request才是真正发起请求的方法。</strong></p>
 
-<p>有人可能会说：<strong>Python运行效率低啊。</strong>可是你想想，在自动化测试应用时，我们需要在乎底层脚本语言的运行效率吗？与其在乎运行效率，还不如思考下如何快速提高自动化测试的覆盖率，也就是自动化case的开发效率。</p>
+<hr />
 
-<p>Python有Python2以及Python3两个大版本，Python2行将就木，本系列文章都以Python3为基础，而且有可能会使用到Python3.5以上版本的特性。</p>
+<p>我们看下官方对<code>requests.Session</code>的介绍：</p>
 
-<ul>
-<li>官网：<a href="https://www.python.org">https://www.python.org</a></li>
-<li>Windows版下载地址: <a href="https://www.python.org/downloads/windows/">https://www.python.org/downloads/windows/</a></li>
-</ul>
-
-<h3 id="1-pip-pipenv">1. pip &amp;&amp; pipenv</h3>
-
-<p>pip 是python下最常用的包管理工具，安装<code>pip</code>之后能够通过运行<code>pip install [packageName]</code>快速安装各种依赖。</p>
-
-<p>pipenv 是个更先进的包管理工具，补强了<code>pip</code>，不过要安装它，得先安装<code>pip</code>:) ，笔者更推荐大家使用<code>pipenv</code>来管理项目的依赖。</p>
-
-<p>安装方法：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">pip install pipenv</pre></div>
 <blockquote>
-<p>☤ Pipenv Features</p>
-
-<ul>
-<li>Enables truly <em>deterministic builds</em>, while easily specifying <em>only what you want</em>.</li>
-<li>Generates and checks file hashes for locked dependencies.</li>
-<li>Automatically install required Pythons, if <code>pyenv</code> is available.</li>
-<li>Automatically finds your project home, recursively, by looking for a <code>Pipfile</code>.</li>
-<li>Automatically generates a <code>Pipfile</code>, if one doesn’t exist.</li>
-<li>Automatically creates a virtualenv in a standard location.</li>
-<li>Automatically adds/removes packages to a <code>Pipfile</code> when they are un/installed.</li>
-<li>Automatically loads <code>.env</code> files, if they exist.</li>
-</ul>
+<p>The Session object allows you to persist certain parameters across requests. It also persists cookies across all requests made from the Session instance, and will use <code>urllib3</code>’s connection pooling. So if you’re making several requests to the same host, the underlying TCP connection will be reused, which can result in a significant performance increase (see HTTP persistent connection).</p>
 </blockquote>
 
-<h3 id="2-pyenv">2. pyenv</h3>
-
-<p>pyenv是python多版本管理工具，尤其推荐<code>Linux</code>或者<code>Mac</code>用户使用：</p>
+<p>我把其特性提炼出来：</p>
 
 <ul>
-<li>系统自带Python版本过低，而且升级风险较大</li>
-<li>如不能正确的管理系统Python的依赖，可能对系统内置工具的使用造成影响</li>
+<li>Session可以保持不同请求的公共参数</li>
+<li>Session可以保持cookies</li>
+<li>Session自动化维护http连接池</li>
 </ul>
 
-<p>所以笔者建议每位非Windows用户最好都安装<code>pyenv</code>，并下载一个较新的版本进行安装。</p>
+<p>拿<code>httpbin.org</code>来展示下<code>Session</code>对象的cookies的自动管理：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">import</span> requests
+<span style="color:#f92672">&gt;&gt;&gt;</span> session <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>Session()
+<span style="color:#f92672">&gt;&gt;&gt;</span> resp <span style="color:#f92672">=</span> session<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;https://httpbin.org/cookies/set&#34;</span>, params<span style="color:#f92672">=</span>dict(freeform<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;hello world&#34;</span>))
+<span style="color:#f92672">&gt;&gt;&gt;</span> resp <span style="color:#f92672">=</span> session<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;https://httpbin.org&#34;</span>)
+<span style="color:#f92672">&gt;&gt;&gt;</span> resp<span style="color:#f92672">.</span>request<span style="color:#f92672">.</span>headers
+{<span style="color:#e6db74">&#39;User-Agent&#39;</span>: <span style="color:#e6db74">&#39;python-requests/2.18.4&#39;</span>, <span style="color:#e6db74">&#39;Accept-Encoding&#39;</span>: <span style="color:#e6db74">&#39;gzip, deflate&#39;</span>, <span style="color:#e6db74">&#39;Accept&#39;</span>: <span style="color:#e6db74">&#39;*/*&#39;</span>, <span style="color:#e6db74">&#39;Connection&#39;</span>: <span style="color:#e6db74">&#39;keep-alive&#39;</span>, <span style="color:#e6db74">&#39;Cookie&#39;</span>: <span style="color:#e6db74">&#39;freeform=&#34;hello world&#34;&#39;</span>}</code></pre></div>
+<p><code>Session</code>对象的接口自动化最大的价值时保持了client的登录态，简化了对Cookies的维护能力。很多时候，你可以把它当做一个浏览器进程：当你在某个tab页面实现了登录，在其他页面自然也登录了。</p>
 
-<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20190419084518.png" alt="" /></p>
+<p><em>介绍完Session的基本概念后，下一章就要正式开始接口自动化的实战了，尽请期待 ：）</em></p>
 
-<h3 id="3-pycharm">3. Pycharm</h3>
-
-<p>Pycharm应该是世界上最好的Python IDE吧，而且社区版还是免费，还不下载个？</p>
-
-<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20190419084601.png" alt="" /></p>
-
-<p><strong>下载地址：</strong></p>
-
-<p><a href="https://www.jetbrains.com/pycharm/download/">https://www.jetbrains.com/pycharm/download/</a></p>
-
-<h3 id="4-unittest">4. Unittest</h3>
-
-<p><code>unittest</code>是Python内置的单元测试框架，它与junit这类单元框架很相似，之后的文章里笔者会使用该框架来组织接口测试用例。</p>
-
-<p><strong>官方文档</strong>：</p>
-
-<p><a href="https://docs.python.org/3/library/unittest.html">https://docs.python.org/3/library/unittest.html</a></p>
-
-<h3 id="5-requests">5. Requests</h3>
-
-<p><code>requests</code>是Python的一个第三方HTTP库，然后有可能是这个星球上最好用的http库了。举个栗子，笔者要发起一个POST请求，请求报文为JSON字符串，那只要这么做：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">requests<span style="color:#f92672">.</span>post(
-  <span style="color:#e6db74">&#34;http://example.com/login&#34;</span>, 
-  json<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#34;username&#34;</span>: <span style="color:#e6db74">&#34;foo&#34;</span>, <span style="color:#e6db74">&#34;password&#34;</span>: <span style="color:#e6db74">&#34;bar!&#34;</span>})</code></pre></div>
-<p><img src="http://docs.python-requests.org/en/master/_static/requests-sidebar.png" alt="" /></p>
-
-<p><strong>在线安装</strong>: <code>pipenv install requests</code></p>
-
-<p><strong>官方文档：</strong><a href="http://docs.python-requests.org/en/master/">http://docs.python-requests.org/en/master/</a></p>
-
-<h3 id="6-pytest">6. pytest</h3>
-
-<p>pytest 是python的第三方测试框架，相比<code>unittest</code>它增强了很多功能，但是笔者对它的使用上相对谨慎，之后只会在用例的收集、执行层上使用它。</p>
-
-<p><img src="https://docs.pytest.org/en/latest/_static/pytest1.png" alt="" /></p>
-
-<p><strong>在线安装</strong>: <code>pipenv install pytest</code></p>
         </div>
 
         
-        
-        <div class="article-toc" style="display:none;">
-            <h3>Contents</h3>
-            <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#0-python">0. Python</a></li>
-<li><a href="#1-pip-pipenv">1. pip &amp;&amp; pipenv</a></li>
-<li><a href="#2-pyenv">2. pyenv</a></li>
-<li><a href="#3-pycharm">3. Pycharm</a></li>
-<li><a href="#4-unittest">4. Unittest</a></li>
-<li><a href="#5-requests">5. Requests</a></li>
-<li><a href="#6-pytest">6. pytest</a></li>
-</ul></li>
-</ul></li>
-</ul>
-</nav>
-        </div>
         
         
 
@@ -251,15 +188,15 @@
     </div>
     <nav id="article-nav">
     
-    <a href="/posts/api-testing-002/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/posts/distribution-system-knowledge-point/" id="article-nav-newer" class="article-nav-link-wrap">
         <div class="article-nav-title"><span>&lt;</span>&nbsp;
-            Python接口测试实战02 - 接口测试的本质
+            分布式系统基础知识
         </div>
     </a>
     
     
-    <a href="/posts/golang-http-client-performance/" id="article-nav-older" class="article-nav-link-wrap">
-        <div class="article-nav-title">Golang Http Client性能验证&nbsp;<span>&gt;</span></div>
+    <a href="/posts/api-testing-002/" id="article-nav-older" class="article-nav-link-wrap">
+        <div class="article-nav-title">Python接口测试实战02 - 接口测试的本质&nbsp;<span>&gt;</span></div>
     </a>
     
 </nav>
