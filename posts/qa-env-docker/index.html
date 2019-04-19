@@ -67,6 +67,23 @@
             
             
             
+            
+            <div id="git-comments"></div>
+            <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+            <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+            <script>
+            var gitment = new Gitment({
+                id: 'qa-env-docker',  
+                owner: 'jacexh',
+                repo: 'comments',
+                oauth: {
+                client_id: '1790bd88a3392daf7a30',
+                client_secret: '1996bbefd45964962dc6e936e71b723277392ad3',
+                }
+            })
+            gitment.render('git-comments')
+            </script>
+            
         </div>
         <div class="article-entry" itemprop="articleBody">
             <p>笔者目前在工作中，使用Python来进行项目的自动化、性能测试，但是在不同的环境下准备Python运行环境时遇到了不少的坑，随便列举一些：</p>

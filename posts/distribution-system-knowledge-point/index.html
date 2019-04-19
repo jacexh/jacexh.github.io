@@ -67,6 +67,23 @@
             
             
             
+            
+            <div id="git-comments"></div>
+            <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+            <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+            <script>
+            var gitment = new Gitment({
+                id: 'distribution-system-knowledge-point',  
+                owner: 'jacexh',
+                repo: 'comments',
+                oauth: {
+                client_id: '1790bd88a3392daf7a30',
+                client_secret: '1996bbefd45964962dc6e936e71b723277392ad3',
+                }
+            })
+            gitment.render('git-comments')
+            </script>
+            
         </div>
         <div class="article-entry" itemprop="articleBody">
             <h2 id="cap定理">CAP定理</h2>

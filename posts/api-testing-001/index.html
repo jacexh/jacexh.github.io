@@ -67,6 +67,23 @@
             
             
             
+            
+            <div id="git-comments"></div>
+            <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+            <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+            <script>
+            var gitment = new Gitment({
+                id: 'api-testing-001',  
+                owner: 'jacexh',
+                repo: 'comments',
+                oauth: {
+                client_id: '1790bd88a3392daf7a30',
+                client_secret: '1996bbefd45964962dc6e936e71b723277392ad3',
+                }
+            })
+            gitment.render('git-comments')
+            </script>
+            
         </div>
         <div class="article-entry" itemprop="articleBody">
             <p>工欲善其事必先利其器，在正式开始介绍使用Python做接口测试前，我们先准备好相应的工具，这样就能快速上手接口测试了。</p>
