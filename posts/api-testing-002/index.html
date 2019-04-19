@@ -73,9 +73,7 @@
             
         </div>
         <div class="article-entry" itemprop="articleBody">
-            
-
-<p>在上一篇简单的介绍了接口测试里用到的工具、类库后，本篇正式开始讲用Python进行接口测试实战。</p>
+            <p>在上一篇简单的介绍了接口测试里用到的工具、类库后，本篇正式开始讲用Python进行接口测试实战。</p>
 
 <h3 id="1-从一个登录接口了解接口调用的方法">1. 从一个登录接口了解接口调用的方法</h3>
 
@@ -86,6 +84,7 @@
 <h4 id="1-1-curl做接口调用">1.1 curl做接口调用：</h4>
 
 <p>先用curl来做一个简单的例子：</p>
+
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&gt;&gt; curl -X POST -d &#34;username=foo&amp;password=bar%21&#34; http://requestbin.qahub.net/z3m6v8z3
 
 ok</pre></div>
@@ -263,7 +262,6 @@ requests<span style="color:#f92672">.</span>post(<span style="color:#e6db74">&#3
     <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test_bad_status</span>(self):
         self<span style="color:#f92672">.</span>assertNotEqual(self<span style="color:#f92672">.</span>client<span style="color:#f92672">.</span>login(<span style="color:#e6db74">&#34;user-forbidden&#34;</span>, <span style="color:#e6db74">&#34;bar!&#34;</span>), <span style="color:#e6db74">&#34;ok&#34;</span>)</code></pre></div>
 <p>资深的测试工程师将接口的调用封装成具体的<code>Client</code>，普通的测试工程师只需要关注的这个<code>Client</code>下<code>login</code>的入参，结合实际的业务场景来设计入参的组合条件，并做出的准确的断言（验证期望值与实际值）。</p>
-
         </div>
 
         
