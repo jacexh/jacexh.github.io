@@ -140,9 +140,7 @@
       <pubDate>Sat, 19 May 2018 08:42:22 +0800</pubDate>
       <author>jace.xh@gmail.com (jacexh)</author>
       <guid>https://blog.xuh.me/posts/api-testing-001/</guid>
-      <description>&lt;p&gt;[TOC]&lt;/p&gt;
-
-&lt;p&gt;工欲善其事必先利其器，在正式开始介绍使用Python做接口测试前，我们先准备好相应的工具，这样就能快速上手接口测试了。&lt;/p&gt;
+      <description>&lt;p&gt;工欲善其事必先利其器，在正式开始介绍使用Python做接口测试前，我们先准备好相应的工具，这样就能快速上手接口测试了。&lt;/p&gt;
 
 &lt;h3 id=&#34;0-python&#34;&gt;0. Python&lt;/h3&gt;
 
