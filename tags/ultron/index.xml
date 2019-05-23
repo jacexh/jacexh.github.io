@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>压力测试 on Jace&#39;s Blog</title>
-    <link>https://blog.xuh.me/tags/%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95/</link>
-    <description>Recent content in 压力测试 on Jace&#39;s Blog</description>
+    <title>Ultron on Jace&#39;s Blog</title>
+    <link>https://blog.xuh.me/tags/ultron/</link>
+    <description>Recent content in Ultron on Jace&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <managingEditor>jace.xh@gmail.com (jacexh)</managingEditor>
@@ -11,7 +11,7 @@
     <copyright>xuh.me — All rights reserved.</copyright>
     <lastBuildDate>Mon, 29 Oct 2018 11:20:00 +0800</lastBuildDate>
     
-	<atom:link href="https://blog.xuh.me/tags/%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://blog.xuh.me/tags/ultron/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -28,36 +28,6 @@
 Fire()方法是请求的行为，当结果返回为nil即没有错误时，则认为请求成功，反之视为请求失败，并记录具体的错误信息
 2.2 Runner type Runner interface { WithConfig(*RunnerConfig) WithTask(*Task) GetConfig() *RunnerConfig GetStatus() Status Start() Done() } 测试执行器，目前具体的实现有localRunner、masterRunner、slaveRunner，分别用于单机压测、分布式压测的控制台、分布式压测的节点
 2.3 RunnerConfig type RunnerConfig struct { Duration time.Duration `json:&amp;#34;duration&amp;#34;` Requests uint64 `json:&amp;#34;requests&amp;#34;` Concurrence int `json:&amp;#34;concurrence&amp;#34;` HatchRate int `json:&amp;#34;hatch_rate&amp;#34;` MinWait time.Duration `json:&amp;#34;min_wait&amp;#34;` MaxWait time.</description>
-    </item>
-    
-    <item>
-      <title>Golang Http Client性能验证</title>
-      <link>https://blog.xuh.me/posts/golang-http-client-performance/</link>
-      <pubDate>Sat, 14 Jan 2017 21:19:00 +0800</pubDate>
-      <author>jace.xh@gmail.com (jacexh)</author>
-      <guid>https://blog.xuh.me/posts/golang-http-client-performance/</guid>
-      <description>&lt;p&gt;&lt;img src=&#34;https://image.slidesharecdn.com/embeddedsoftwarewithgolang-170224034117/95/embedded-software-with-golang-5-638.jpg?cb=1487907791&#34; alt=&#34;golang&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;一直很好奇golang的&lt;code&gt;net/http&lt;/code&gt;的client性能如何，于是我这里做了一次验证，先上代码：&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Locust负载测试框架初探</title>
-      <link>https://blog.xuh.me/posts/locust-intro/</link>
-      <pubDate>Mon, 20 Jul 2015 15:28:00 +0800</pubDate>
-      <author>jace.xh@gmail.com (jacexh)</author>
-      <guid>https://blog.xuh.me/posts/locust-intro/</guid>
-      <description>&lt;p&gt;&lt;a href=&#34;http://locust.io/&#34;&gt;Locust&lt;/a&gt;是一款类似于&lt;code&gt;Jmeter&lt;/code&gt;开源负载测试工具，所不同的是它是用python实现，并支持python脚本。 &lt;code&gt;locust&lt;/code&gt;提供web ui界面，能够方便用户实时监控脚本运行状态。&lt;/p&gt;
-
-&lt;p&gt;这里我以模拟公司OA系统登录、注销为例，简单的了解下&lt;code&gt;locust&lt;/code&gt;的使用。&lt;/p&gt;
-
-&lt;h2 id=&#34;locust的安装&#34;&gt;Locust的安装&lt;/h2&gt;
-
-&lt;h3 id=&#34;python的安装&#34;&gt;Python的安装&lt;/h3&gt;
-
-&lt;p&gt;Windows用户可以从&lt;a href=&#34;http://python.org&#34;&gt;Python官网&lt;/a&gt;下载适合你系统的安装程序进行安装；在安装完成后，建议将默认安装路径&lt;code&gt;C:\Python27&lt;/code&gt;添加到系统环境变量中，另外一并将&lt;code&gt;C:\Python27\Scripts&lt;/code&gt;(当前该目录可能不存在)也添加进去&lt;/p&gt;
-
-&lt;p&gt;Linux/Unix用户则可以略过这一步骤，系统本身已经有Python的存在，当然你如果对当前版本不满意的话，可以再自行安装熟悉的版本&lt;/p&gt;</description>
     </item>
     
   </channel>

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ultron使用手册 // Jace&#39;s Blog</title>
+
+        <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+        <meta property="og:title" content="Ultron使用手册" />
+    <meta property="og:description" content="" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://blog.xuh.me/posts/ultron-manuals/" />
+    
+
+    <link href="" rel="alternate" type="application/rss+xml" title="Jace&#39;s Blog" />
+    <link rel="shortcut icon" href="/favicon.png">
+
+    <link href="https://blog.xuh.me/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+    <link href="https://blog.xuh.me/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="https://blog.xuh.me/css/style.css">
+
+    <meta name="generator" content="Hugo 0.55.3" />
+</head>
+
+
+<body>
+<div id="container">
+    <header id="header">
+    <div id="header-outer" class="outer">
+        <div id="header-inner" class="inner">
+            <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+            <a id="logo" class="logo-text" href="https://blog.xuh.me/">Jace&#39;s Blog</a>
+            <nav id="main-nav">
+                
+                <a class="main-nav-link" href="/">Home</a>
+                
+                <a class="main-nav-link" href="/posts">Posts</a>
+                
+                <a class="main-nav-link" href="/tags">Tags</a>
+                
+            </nav>
+            <nav id="sub-nav">
+                <div id="search-form-wrap">
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+
+    <section id="main" class="outer">
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        <header class="article-header">
+            <h1 class="article-title" itemprop="name">Ultron使用手册</h1>
+        </header>
+        
+        <div class="article-meta">
+            <a href="/posts/ultron-manuals/" class="article-date">
+                <time datetime='2018-10-29T11:20:00.000&#43;08:00' itemprop="datePublished">2018-10-29</time>
+            </a>
+            
+            
+            
+        </div>
+        <div class="article-entry" itemprop="articleBody">
+            
+
+<h2 id="1-开发背景">1. 开发背景</h2>
+
+<p>在一次与其他压测工具比较的过程中，我无意发现之前使用的Locust有致命的性能问题：对于极快的GET接口，其产生的压力比AB、JMeter等少了几个量级，再加上我本身不满因Locust使用Python开发只能利用单核而导致经常需要多实例部署的情况，我决定利用Golang原生的高并发能力来重写一个压测工具。</p>
+
+<p>我希望它满足以下特性：</p>
+
+<ol>
+<li>单实力高并发能力</li>
+<li>支持分布式部署</li>
+<li>支持接入多种协议</li>
+<li>脚本层面借鉴Locust的方式，高度的定制化能力</li>
+</ol>
+
+<p>但与成熟的压测工具相比，Ultron存在以下明显的劣势：</p>
+
+<ol>
+<li>缺少GUI界面，门槛较高，需要一定的Golang编程能力</li>
+<li>更像一个“压测执行框架”，而不是工具</li>
+<li>目前仅接入http协议，插件也极少</li>
+<li>虽然开源（<a href="https://github.com/jacexh/ultron），但未做推广，使用者极少">https://github.com/jacexh/ultron），但未做推广，使用者极少</a></li>
+</ol>
+
+<h2 id="2-主要对象介绍">2 主要对象介绍</h2>
+
+<h3 id="2-1-attacker">2.1 Attacker</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Attacker</span> <span style="color:#66d9ef">interface</span> {
+    <span style="color:#a6e22e">Name</span>() <span style="color:#66d9ef">string</span>
+    <span style="color:#a6e22e">Fire</span>() <span style="color:#66d9ef">error</span>
+}</code></pre></div>
+<p>Attacker是请求行为、事务的interface，结构体<code>HTTPAttacker</code>是该interface的一个实现，其作用是使用内置<code>net/http</code>包来处理http请求</p>
+
+<p>其中<code>Name()</code>方法返回了请求行为的名称，在http压测中，可以理解为接口名</p>
+
+<p><code>Fire()</code>方法是请求的行为，当结果返回为<code>nil</code>即没有错误时，则认为请求成功，反之视为请求失败，并记录具体的错误信息</p>
+
+<h3 id="2-2-runner">2.2 Runner</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Runner</span> <span style="color:#66d9ef">interface</span> {
+    <span style="color:#a6e22e">WithConfig</span>(<span style="color:#f92672">*</span><span style="color:#a6e22e">RunnerConfig</span>)
+    <span style="color:#a6e22e">WithTask</span>(<span style="color:#f92672">*</span><span style="color:#a6e22e">Task</span>)
+    <span style="color:#a6e22e">GetConfig</span>() <span style="color:#f92672">*</span><span style="color:#a6e22e">RunnerConfig</span>
+    <span style="color:#a6e22e">GetStatus</span>() <span style="color:#a6e22e">Status</span>
+    <span style="color:#a6e22e">Start</span>()
+    <span style="color:#a6e22e">Done</span>()
+}</code></pre></div>
+<p>测试执行器，目前具体的实现有<code>localRunner</code>、<code>masterRunner</code>、<code>slaveRunner</code>，分别用于单机压测、分布式压测的控制台、分布式压测的节点</p>
+
+<h3 id="2-3-runnerconfig">2.3 RunnerConfig</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">RunnerConfig</span> <span style="color:#66d9ef">struct</span> {
+    <span style="color:#a6e22e">Duration</span>    <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Duration</span> <span style="color:#e6db74">`json:&#34;duration&#34;`</span>
+    <span style="color:#a6e22e">Requests</span>    <span style="color:#66d9ef">uint64</span>        <span style="color:#e6db74">`json:&#34;requests&#34;`</span>
+    <span style="color:#a6e22e">Concurrence</span> <span style="color:#66d9ef">int</span>           <span style="color:#e6db74">`json:&#34;concurrence&#34;`</span>
+    <span style="color:#a6e22e">HatchRate</span>   <span style="color:#66d9ef">int</span>           <span style="color:#e6db74">`json:&#34;hatch_rate&#34;`</span>
+    <span style="color:#a6e22e">MinWait</span>     <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Duration</span> <span style="color:#e6db74">`json:&#34;min_wait&#34;`</span>
+    <span style="color:#a6e22e">MaxWait</span>     <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Duration</span> <span style="color:#e6db74">`json:&#34;max_wait&#34;`</span>
+}</code></pre></div>
+<p>一次压测任务的配置，分别解释下字段含义：</p>
+
+<ul>
+<li><code>Duration</code>：压测持续时间，当为0时，则不控制时长</li>
+<li><code>Requests</code>：压测请求总量，<strong>注意：该字段无法严格控制</strong></li>
+<li><code>Concurrenct</code>：压测并发数</li>
+<li><code>HatchRate</code>：压测开始时，每秒启动的线程(goroutine)数</li>
+<li><code>MinWait</code>、<code>MaxWait</code>：在一个线程(goroutine)中，两次连续的请求中间的等待时间间隔</li>
+</ul>
+
+<h3 id="2-4-task">2.4 Task</h3>
+
+<p>Runner运行的对象，是一个包含了多个<code>Attacker</code>对象的集合，可以为不同的<code>Attacker</code>设置权重，从而影响其压测的比例</p>
+
+<h2 id="3-内置的httpattacker使用">3. 内置的HTTPAttacker使用</h2>
+
+<p>一个简单的例子：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+
+<span style="color:#f92672">import</span> (
+	<span style="color:#e6db74">&#34;net/http&#34;</span>
+
+	<span style="color:#e6db74">&#34;github.com/jacexh/ultron&#34;</span>
+)
+
+<span style="color:#66d9ef">const</span> (
+	<span style="color:#a6e22e">api</span> = <span style="color:#e6db74">&#34;http://10.0.0.30/benchmark&#34;</span>
+)
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">attacker</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ultron</span>.<span style="color:#a6e22e">NewHTTPAttacker</span>(
+        <span style="color:#e6db74">&#34;benchmark&#34;</span>, 
+        <span style="color:#66d9ef">func</span>() (<span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>, <span style="color:#66d9ef">error</span>) { 
+            <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">NewRequest</span>(<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">MethodGet</span>, <span style="color:#a6e22e">api</span>, <span style="color:#66d9ef">nil</span>) }
+    )
+	<span style="color:#a6e22e">task</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ultron</span>.<span style="color:#a6e22e">NewTask</span>()
+	<span style="color:#a6e22e">task</span>.<span style="color:#a6e22e">Add</span>(<span style="color:#a6e22e">attacker</span>, <span style="color:#ae81ff">1</span>)
+
+	<span style="color:#a6e22e">ultron</span>.<span style="color:#a6e22e">LocalRunner</span>.<span style="color:#a6e22e">WithTask</span>(<span style="color:#a6e22e">task</span>)
+	<span style="color:#a6e22e">ultron</span>.<span style="color:#a6e22e">LocalRunner</span>.<span style="color:#a6e22e">Start</span>()
+}</code></pre></div>
+<p>内置的<code>HTTPAttacker</code>已经实现了<code>Fire()</code>方法，其负责将传入的<code>*http.Request</code>对象发送到目标地址，并且自行判断status_code等字段，并判断是否错误。</p>
+
+<p>而<code>*http.Request</code>从通过调用脚本层实现<code>HTTPAttacker.Prepay()</code>方法获取，如上面代码中的</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">return</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">NewRequest</span>(<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">MethodGet</span>, <span style="color:#a6e22e">api</span>, <span style="color:#66d9ef">nil</span>)</code></pre></div>
+<p>另外，给一个稍微复杂点的例子：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">newBSCRequest</span>() (<span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>, <span style="color:#66d9ef">error</span>) {
+	<span style="color:#a6e22e">r</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">request</span>{
+		<span style="color:#a6e22e">TerminalSN</span>:  <span style="color:#a6e22e">terminalSN</span>,
+		<span style="color:#a6e22e">ClientSN</span>:    <span style="color:#a6e22e">atomic</span>.<span style="color:#a6e22e">AddUint64</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">csn</span>, <span style="color:#ae81ff">1</span>),
+		<span style="color:#a6e22e">TotalAmount</span>: <span style="color:#ae81ff">1</span>,
+		<span style="color:#a6e22e">Payway</span>:      <span style="color:#a6e22e">paywayAlipay</span>,
+		<span style="color:#a6e22e">DynamicID</span>:   <span style="color:#e6db74">&#34;285208607915032042&#34;</span>,
+		<span style="color:#a6e22e">Subject</span>:     <span style="color:#e6db74">&#34;wosai-inc&#34;</span>,
+		<span style="color:#a6e22e">Operator</span>:    <span style="color:#e6db74">&#34;123456&#34;</span>,
+	}
+	<span style="color:#a6e22e">data</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ultron</span>.<span style="color:#a6e22e">J</span>.<span style="color:#a6e22e">Marshal</span>(<span style="color:#a6e22e">r</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>, <span style="color:#a6e22e">err</span>
+	}
+	<span style="color:#a6e22e">req</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">NewRequest</span>(<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">MethodPost</span>, <span style="color:#a6e22e">upayURL</span><span style="color:#f92672">+</span><span style="color:#e6db74">&#34;/upay/v2/pay&#34;</span>, <span style="color:#a6e22e">bytes</span>.<span style="color:#a6e22e">NewBuffer</span>(<span style="color:#a6e22e">data</span>))
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>, <span style="color:#a6e22e">err</span>
+	}
+	<span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">Header</span>.<span style="color:#a6e22e">Set</span>(<span style="color:#e6db74">&#34;Content-Type&#34;</span>, <span style="color:#e6db74">&#34;application/json&#34;</span>)
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">req</span>, <span style="color:#66d9ef">nil</span>
+}</code></pre></div>
+<p>上面提到了<code>HTTPAttacker.Fire</code>会自行校验status_code，但往往这是不够的，好在<code>HTTPAttacker</code>也支持脚本层定义检验函数：<code>func(*http.Response, []byte) error</code></p>
+
+<p>如校验支付网关的返回结果：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">checkResponse</span>(<span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Response</span>, <span style="color:#a6e22e">body</span> []<span style="color:#66d9ef">byte</span>) <span style="color:#66d9ef">error</span> {
+	<span style="color:#a6e22e">resp</span> <span style="color:#f92672">:=</span> new(<span style="color:#a6e22e">response</span>)
+	<span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ultron</span>.<span style="color:#a6e22e">J</span>.<span style="color:#a6e22e">Unmarshal</span>(<span style="color:#a6e22e">body</span>, <span style="color:#a6e22e">resp</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">err</span>
+	}
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">resp</span>.<span style="color:#a6e22e">ResultCode</span> <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;200&#34;</span> {
+		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">errors</span>.<span style="color:#a6e22e">New</span>(<span style="color:#a6e22e">resp</span>.<span style="color:#a6e22e">ErrorCode</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;::&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">resp</span>.<span style="color:#a6e22e">ErrorMessage</span>)
+	}
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">resp</span>.<span style="color:#a6e22e">Biz</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> <span style="color:#f92672">&amp;&amp;</span> !<span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">Contains</span>(<span style="color:#a6e22e">resp</span>.<span style="color:#a6e22e">Biz</span>.<span style="color:#a6e22e">ResultCode</span>, <span style="color:#e6db74">&#34;SUCCESS&#34;</span>) {
+		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">resp</span>.<span style="color:#a6e22e">Biz</span>.<span style="color:#a6e22e">Order</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+			<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">errors</span>.<span style="color:#a6e22e">New</span>(<span style="color:#a6e22e">resp</span>.<span style="color:#a6e22e">Biz</span>.<span style="color:#a6e22e">ResultCode</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;@&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">resp</span>.<span style="color:#a6e22e">Biz</span>.<span style="color:#a6e22e">Order</span>.<span style="color:#a6e22e">SN</span>)
+		}
+		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">errors</span>.<span style="color:#a6e22e">New</span>(<span style="color:#a6e22e">resp</span>.<span style="color:#a6e22e">Biz</span>.<span style="color:#a6e22e">ResultCode</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;::&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">resp</span>.<span style="color:#a6e22e">Biz</span>.<span style="color:#a6e22e">ErrorCode</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;::&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">resp</span>.<span style="color:#a6e22e">Biz</span>.<span style="color:#a6e22e">ErrorMessage</span>)
+	}
+	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>
+}</code></pre></div>
+<h2 id="4-接入其他协议的attacker">4. 接入其他协议的Attacker</h2>
+
+<p>在上面介绍过了，理论上只要该协议能实现<code>Attacer</code>这个interface，即可被ultron支持，甚至还可以写出这样的<code>Attacker</code> <a href="https://github.com/jacexh/ultron/blob/master/example/benchmark/main.go">https://github.com/jacexh/ultron/blob/master/example/benchmark/main.go</a></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> (
+	<span style="color:#a6e22e">benchmark</span> <span style="color:#66d9ef">struct</span>{}
+)
+
+<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#a6e22e">benchmark</span>) <span style="color:#a6e22e">Name</span>() <span style="color:#66d9ef">string</span> {
+	<span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;benchmark&#34;</span>
+}
+
+<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#a6e22e">benchmark</span>) <span style="color:#a6e22e">Fire</span>() <span style="color:#66d9ef">error</span> {
+	<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Millisecond</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">10</span>)
+	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>
+}</code></pre></div>
+<p>稍微实际一点的例子——玛雅云压测：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">MayaAttacker</span> <span style="color:#66d9ef">struct</span> {
+	<span style="color:#a6e22e">payload</span> []<span style="color:#66d9ef">byte</span>
+	<span style="color:#a6e22e">name</span>    <span style="color:#66d9ef">string</span>
+	<span style="color:#a6e22e">pool</span>    <span style="color:#f92672">*</span><span style="color:#a6e22e">sync</span>.<span style="color:#a6e22e">Pool</span>
+}
+
+<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">m</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">MayaAttacker</span>) <span style="color:#a6e22e">Fire</span>() <span style="color:#66d9ef">error</span> {
+	<span style="color:#a6e22e">conn</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">net</span>.<span style="color:#a6e22e">DialTimeout</span>(<span style="color:#e6db74">&#34;tcp&#34;</span>, <span style="color:#a6e22e">serverAddr</span>, <span style="color:#a6e22e">TimeoutConnect</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">err</span>
+	}
+	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">conn</span>.<span style="color:#a6e22e">Close</span>()
+	<span style="color:#a6e22e">conn</span>.<span style="color:#a6e22e">SetWriteDeadline</span>(<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Now</span>().<span style="color:#a6e22e">Add</span>(<span style="color:#a6e22e">TimeoutWrite</span>))
+	<span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">err</span> = <span style="color:#a6e22e">conn</span>.<span style="color:#a6e22e">Write</span>(<span style="color:#a6e22e">m</span>.<span style="color:#a6e22e">payload</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">err</span>
+	}
+	<span style="color:#a6e22e">conn</span>.<span style="color:#a6e22e">SetReadDeadline</span>(<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Now</span>().<span style="color:#a6e22e">Add</span>(<span style="color:#a6e22e">TimeoutRead</span>))
+	<span style="color:#a6e22e">output</span> <span style="color:#f92672">:=</span> make([]<span style="color:#66d9ef">byte</span>, <span style="color:#ae81ff">512</span>)
+	<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">conn</span>.<span style="color:#a6e22e">Read</span>(<span style="color:#a6e22e">output</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">nil</span> {
+		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">errors</span>.<span style="color:#a6e22e">New</span>(<span style="color:#e6db74">&#34;invalid response&#34;</span>)
+	}
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">err</span>
+}
+
+<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">m</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">MayaAttacker</span>) <span style="color:#a6e22e">Name</span>() <span style="color:#66d9ef">string</span> {
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">m</span>.<span style="color:#a6e22e">name</span>
+}</code></pre></div>
+<h2 id="5-eventhook">5. EventHook</h2>
+
+<p>目前具备<code>LocalEventHook</code>、<code>MasterEventHook</code>、<code>SalveEventHook</code>，并且支持对单次结果<code>*Result</code>以及每5秒一次的<code>Result</code>做扩展</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">ResultHandleFunc</span> <span style="color:#66d9ef">func</span>(<span style="color:#f92672">*</span><span style="color:#a6e22e">Result</span>)
+<span style="color:#66d9ef">type</span> <span style="color:#a6e22e">ReportHandleFunc</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">Report</span>)</code></pre></div>
+<p>比如把这些数据实时写入influxdb （<a href="https://github.com/jacexh/ultron/blob/master/helper/influxdb.go）从而实现grafana的实时结果展示">https://github.com/jacexh/ultron/blob/master/helper/influxdb.go）从而实现grafana的实时结果展示</a></p>
+
+<h2 id="6-分布式执行">6. 分布式执行</h2>
+
+<p>当目标是百万级QPS或者并发时，你也许需要分布式执行来扩展能力了，但一般情况没有必要使用这种方式，另外要注意：<strong>我并没有严格测试分布式执行，不确定是否足够健壮</strong></p>
+
+<p>分布式执行的架构可以参考该文章：</p>
+
+<p>slave节点的脚本如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+
+<span style="color:#f92672">import</span> (
+	<span style="color:#e6db74">&#34;net/http&#34;</span>
+
+	<span style="color:#e6db74">&#34;github.com/jacexh/ultron&#34;</span>
+	<span style="color:#e6db74">&#34;google.golang.org/grpc&#34;</span>
+)
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">task</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ultron</span>.<span style="color:#a6e22e">NewTask</span>()
+	<span style="color:#a6e22e">baidu</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ultron</span>.<span style="color:#a6e22e">NewHTTPAttacker</span>(<span style="color:#e6db74">&#34;nginx&#34;</span>, <span style="color:#66d9ef">func</span>() (<span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>, <span style="color:#66d9ef">error</span>) {
+		<span style="color:#a6e22e">req</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">NewRequest</span>(<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">MethodGet</span>, <span style="color:#e6db74">&#34;http://www.baidu.com/&#34;</span>, <span style="color:#66d9ef">nil</span>)
+		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+			<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>, <span style="color:#a6e22e">err</span>
+		}
+		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">req</span>, <span style="color:#66d9ef">nil</span>
+	})
+	<span style="color:#a6e22e">task</span>.<span style="color:#a6e22e">Add</span>(<span style="color:#a6e22e">baidu</span>, <span style="color:#ae81ff">1</span>)
+
+	<span style="color:#a6e22e">ultron</span>.<span style="color:#a6e22e">SlaveRunner</span>.<span style="color:#a6e22e">Connect</span>(<span style="color:#e6db74">&#34;127.0.0.1:9500&#34;</span>, <span style="color:#a6e22e">grpc</span>.<span style="color:#a6e22e">WithInsecure</span>())
+	<span style="color:#a6e22e">ultron</span>.<span style="color:#a6e22e">SlaveRunner</span>.<span style="color:#a6e22e">WithTask</span>(<span style="color:#a6e22e">task</span>)
+	<span style="color:#a6e22e">ultron</span>.<span style="color:#a6e22e">SlaveRunner</span>.<span style="color:#a6e22e">Start</span>()
+}</code></pre></div>
+<p><code>RunnerConfig</code>参数将会由master节点下发，无须在slave脚本层定义</p>
+
+<p>通过调用master监听的http接口来<code>POST /start</code>触发任务的执行</p>
+
+<h2 id="7-todo">7. TODO</h2>
+
+<ol>
+<li>加个可爱的web ui</li>
+</ol>
+
+        </div>
+
+        
+        
+        <div class="article-toc" style="display:none;">
+            <h3>Contents</h3>
+            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#1-开发背景">1. 开发背景</a></li>
+<li><a href="#2-主要对象介绍">2 主要对象介绍</a>
+<ul>
+<li><a href="#2-1-attacker">2.1 Attacker</a></li>
+<li><a href="#2-2-runner">2.2 Runner</a></li>
+<li><a href="#2-3-runnerconfig">2.3 RunnerConfig</a></li>
+<li><a href="#2-4-task">2.4 Task</a></li>
+</ul></li>
+<li><a href="#3-内置的httpattacker使用">3. 内置的HTTPAttacker使用</a></li>
+<li><a href="#4-接入其他协议的attacker">4. 接入其他协议的Attacker</a></li>
+<li><a href="#5-eventhook">5. EventHook</a></li>
+<li><a href="#6-分布式执行">6. 分布式执行</a></li>
+<li><a href="#7-todo">7. TODO</a></li>
+</ul></li>
+</ul>
+</nav>
+        </div>
+        
+        
+
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.slim.min.js" integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc=" crossorigin="anonymous"></script>
+        <script>
+            (function() {
+                var $toc = $('#TableOfContents');
+                if ($toc.length > 0) {
+                    var $window = $(window);
+
+                    function onScroll(){
+                        var currentScroll = $window.scrollTop();
+                        var h = $('.article-entry h1, .article-entry h2, .article-entry h3, .article-entry h4, .article-entry h5, .article-entry h6');
+                        var id = "";
+                        h.each(function (i, e) {
+                            e = $(e);
+                            if (e.offset().top - 10 <= currentScroll) {
+                                id = e.attr('id');
+                            }
+                        });
+                        var active = $toc.find('a.active');
+                        if (active.length == 1 && active.eq(0).attr('href') == '#' + id) return true;
+
+                        active.each(function (i, e) {
+                            $(e).removeClass('active').siblings('ul').hide();
+                        });
+                        $toc.find('a[href="#' + id + '"]').parentsUntil('#TableOfContents').each(function (i, e) {
+                            $(e).children('a').addClass('active').siblings('ul').show();
+                        });
+                    }
+
+                    $window.on('scroll', onScroll);
+                    $(document).ready(function() {
+                        $toc.find('a').parent('li').find('ul').hide();
+                        onScroll();
+                        document.getElementsByClassName('article-toc')[0].style.display = '';
+                    });
+                }
+            })();
+        </script>
+        
+
+        
+        <footer class="article-footer">
+            <ul class="article-tag-list">
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://blog.xuh.me//tags/locust">Locust
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://blog.xuh.me//tags/ultron">Ultron
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://blog.xuh.me//tags/%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95">压力测试
+                    </a>
+                </li>
+                
+            </ul>
+        </footer>
+        
+        <nav id="article-nav">
+    
+    <a href="/posts/distribution-system-knowledge-point/" id="article-nav-newer" class="article-nav-link-wrap">
+        <div class="article-nav-title"><span>&lt;</span>&nbsp;
+            分布式系统基础知识
+        </div>
+    </a>
+    
+    
+    <a href="/posts/api-testing-003/" id="article-nav-older" class="article-nav-link-wrap">
+        <div class="article-nav-title">Python接口测试实战3 - 接口封装的基石：requests.Session&nbsp;<span>&gt;</span></div>
+    </a>
+    
+</nav>
+
+
+        
+        <script src="https://utteranc.es/client.js"
+            repo="jacexh/comments"
+            issue-term="pathname"
+            label="blog"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+        </script>
+        
+    </div>
+</article>
+
+        
+    </section>
+    <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2019 jacexh
+            <br />
+            Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> with theme <a href="https://github.com/carsonip/hugo-theme-minos" target="_blank">Minos</a>
+        </div>
+    </div>
+    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark.min.css" integrity="sha256-GA29iW/iYj9FcuQQktvW45pRzHvZeFfgeFvA4tGVjpM=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js" integrity="sha256-aYTdUrn6Ow1DDgh5JTc3aDGnnju48y/1c8s1dgkYPQ8=" crossorigin="anonymous"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    
+    <script>
+        document.getElementById('main-nav-toggle').addEventListener('click', function () {
+            var header = document.getElementById('header');
+            if (header.classList.contains('mobile-on')) {
+                header.classList.remove('mobile-on');
+            } else {
+                header.classList.add('mobile-on');
+            }
+        });
+    </script>
+</footer>
+
+</div>
+</body>
+</html>

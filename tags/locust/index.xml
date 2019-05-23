@@ -9,10 +9,26 @@
     <managingEditor>jace.xh@gmail.com (jacexh)</managingEditor>
     <webMaster>jace.xh@gmail.com (jacexh)</webMaster>
     <copyright>xuh.me — All rights reserved.</copyright>
-    <lastBuildDate>Wed, 29 Jul 2015 11:20:00 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 29 Oct 2018 11:20:00 +0800</lastBuildDate>
     
 	<atom:link href="https://blog.xuh.me/tags/locust/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Ultron使用手册</title>
+      <link>https://blog.xuh.me/posts/ultron-manuals/</link>
+      <pubDate>Mon, 29 Oct 2018 11:20:00 +0800</pubDate>
+      <author>jace.xh@gmail.com (jacexh)</author>
+      <guid>https://blog.xuh.me/posts/ultron-manuals/</guid>
+      <description>1. 开发背景 在一次与其他压测工具比较的过程中，我无意发现之前使用的Locust有致命的性能问题：对于极快的GET接口，其产生的压力比AB、JMeter等少了几个量级，再加上我本身不满因Locust使用Python开发只能利用单核而导致经常需要多实例部署的情况，我决定利用Golang原生的高并发能力来重写一个压测工具。
+我希望它满足以下特性：
+ 单实力高并发能力 支持分布式部署 支持接入多种协议 脚本层面借鉴Locust的方式，高度的定制化能力  但与成熟的压测工具相比，Ultron存在以下明显的劣势：
+ 缺少GUI界面，门槛较高，需要一定的Golang编程能力 更像一个“压测执行框架”，而不是工具 目前仅接入http协议，插件也极少 虽然开源（https://github.com/jacexh/ultron），但未做推广，使用者极少  2 主要对象介绍 2.1 Attacker type Attacker interface { Name() string Fire() error } Attacker是请求行为、事务的interface，结构体HTTPAttacker是该interface的一个实现，其作用是使用内置net/http包来处理http请求
+其中Name()方法返回了请求行为的名称，在http压测中，可以理解为接口名
+Fire()方法是请求的行为，当结果返回为nil即没有错误时，则认为请求成功，反之视为请求失败，并记录具体的错误信息
+2.2 Runner type Runner interface { WithConfig(*RunnerConfig) WithTask(*Task) GetConfig() *RunnerConfig GetStatus() Status Start() Done() } 测试执行器，目前具体的实现有localRunner、masterRunner、slaveRunner，分别用于单机压测、分布式压测的控制台、分布式压测的节点
+2.3 RunnerConfig type RunnerConfig struct { Duration time.Duration `json:&amp;#34;duration&amp;#34;` Requests uint64 `json:&amp;#34;requests&amp;#34;` Concurrence int `json:&amp;#34;concurrence&amp;#34;` HatchRate int `json:&amp;#34;hatch_rate&amp;#34;` MinWait time.Duration `json:&amp;#34;min_wait&amp;#34;` MaxWait time.</description>
+    </item>
     
     <item>
       <title>使用Docker解决自动化、性能测试的外部依赖</title>
