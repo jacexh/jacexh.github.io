@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DataStore使用介绍 // Jace&#39;s Blog</title>
+
+        <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+        <meta property="og:title" content="DataStore使用介绍" />
+    <meta property="og:description" content="" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://blog.xuh.me/posts/datastore-manuals/" />
+    
+
+    <link href="" rel="alternate" type="application/rss+xml" title="Jace&#39;s Blog" />
+    <link rel="shortcut icon" href="/favicon.png">
+
+    <link href="https://blog.xuh.me/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+    <link href="https://blog.xuh.me/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="https://blog.xuh.me/css/style.css">
+
+    <meta name="generator" content="Hugo 0.55.3" />
+</head>
+
+
+<body>
+<div id="container">
+    <header id="header">
+    <div id="header-outer" class="outer">
+        <div id="header-inner" class="inner">
+            <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+            <a id="logo" class="logo-text" href="https://blog.xuh.me/">Jace&#39;s Blog</a>
+            <nav id="main-nav">
+                
+                <a class="main-nav-link" href="/">Home</a>
+                
+                <a class="main-nav-link" href="/posts">Posts</a>
+                
+                <a class="main-nav-link" href="/tags">Tags</a>
+                
+            </nav>
+            <nav id="sub-nav">
+                <div id="search-form-wrap">
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+
+    <section id="main" class="outer">
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        <header class="article-header">
+            <h1 class="article-title" itemprop="name">DataStore使用介绍</h1>
+        </header>
+        
+        <div class="article-meta">
+            <a href="/posts/datastore-manuals/" class="article-date">
+                <time datetime='2019-05-23T16:20:00.000&#43;08:00' itemprop="datePublished">2019-05-23</time>
+            </a>
+            
+            
+            
+        </div>
+        <div class="article-entry" itemprop="articleBody">
+            <p>在测试框架的<code>data</code>目录下有<code>test.json</code>、<code>test2.json</code>两份文件，用于存放test、test2环境的静态测试数据，比如：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+    <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#e6db74">&#34;581e3432-9f03-0ae3-ddc5-d197601c6850&#34;</span>,
+    <span style="color:#f92672">&#34;sn&#34;</span>: <span style="color:#e6db74">&#34;00000261001200200019186&#34;</span>,
+    <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;自动化测试门店&#34;</span>,
+    <span style="color:#f92672">&#34;industry&#34;</span>: <span style="color:#e6db74">&#34;e586aa25-312d-11e6-aebb-ecf4bbdee2f0&#34;</span>,
+    <span style="color:#f92672">&#34;address&#34;</span>: [<span style="color:#e6db74">&#34;江苏省&#34;</span>, <span style="color:#e6db74">&#34;苏州市&#34;</span>, <span style="color:#e6db74">&#34;姑苏区&#34;</span>, <span style="color:#e6db74">&#34;东长路88号&#34;</span>],
+    <span style="color:#f92672">&#34;merchant&#34;</span>: <span style="color:#e6db74">&#34;default_merchant&#34;</span>,
+    <span style="color:#f92672">&#34;contact_name&#34;</span>: <span style="color:#e6db74">&#34;徐豪&#34;</span>,
+    <span style="color:#f92672">&#34;contact_cellphone&#34;</span>: <span style="color:#e6db74">&#34;10088880001&#34;</span>,
+    <span style="color:#f92672">&#34;cashiers&#34;</span>: [<span style="color:#e6db74">&#34;default_cashier&#34;</span>],
+    <span style="color:#f92672">&#34;admins&#34;</span>: [<span style="color:#e6db74">&#34;default_admin&#34;</span>],
+    <span style="color:#f92672">&#34;@object&#34;</span>: <span style="color:#e6db74">&#34;store&#34;</span>,
+    <span style="color:#f92672">&#34;@extended&#34;</span>: {
+        <span style="color:#f92672">&#34;label&#34;</span>: <span style="color:#e6db74">&#34;default_store&#34;</span>,
+        <span style="color:#f92672">&#34;group&#34;</span>: <span style="color:#e6db74">&#34;store&#34;</span>
+    }
+}<span style="color:#960050;background-color:#1e0010">,</span>
+{
+    <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#e6db74">&#34;5c82b3f9-e5d2-4e21-ab4b-800d6c7b7265&#34;</span>,
+    <span style="color:#f92672">&#34;sn&#34;</span>: <span style="color:#e6db74">&#34;1580000000517499&#34;</span>,
+    <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;无锡办事处&#34;</span>,
+    <span style="color:#f92672">&#34;industry&#34;</span>: <span style="color:#e6db74">&#34;e586aa25-312d-11e6-aebb-ecf4bbdee2f0&#34;</span>,
+    <span style="color:#f92672">&#34;address&#34;</span>: [<span style="color:#e6db74">&#34;江苏省&#34;</span>, <span style="color:#e6db74">&#34;无锡市&#34;</span>, <span style="color:#e6db74">&#34;崇安区&#34;</span>, <span style="color:#e6db74">&#34;湖滨大道99号&#34;</span>],
+    <span style="color:#f92672">&#34;contact_name&#34;</span>: <span style="color:#e6db74">&#34;Bill Smith&#34;</span>,
+    <span style="color:#f92672">&#34;contact_cellphone&#34;</span>: <span style="color:#e6db74">&#34;10088880002&#34;</span>,
+    <span style="color:#f92672">&#34;merchant&#34;</span>: <span style="color:#e6db74">&#34;default_merchant&#34;</span>,
+    <span style="color:#f92672">&#34;admins&#34;</span>: [<span style="color:#e6db74">&#34;alternative_admin&#34;</span>],
+    <span style="color:#f92672">&#34;cashiers&#34;</span>: [<span style="color:#e6db74">&#34;alternative_cashier&#34;</span>],
+    <span style="color:#f92672">&#34;@object&#34;</span>: <span style="color:#e6db74">&#34;store&#34;</span>,
+    <span style="color:#f92672">&#34;@extended&#34;</span>: {
+        <span style="color:#f92672">&#34;label&#34;</span>: <span style="color:#e6db74">&#34;alternative_store&#34;</span>,
+        <span style="color:#f92672">&#34;group&#34;</span>: <span style="color:#e6db74">&#34;store&#34;</span>
+    }
+}</code></pre></div>
+<p>很多同事会把测试中用到的数据改成一个json object并打上一个标签存放到其中，比如：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+    <span style="color:#f92672">&#34;username&#34;</span>: <span style="color:#e6db74">&#34;10612345005&#34;</span>,
+    <span style="color:#f92672">&#34;password&#34;</span>: <span style="color:#e6db74">&#34;11111111&#34;</span>,
+    <span style="color:#f92672">&#34;account_id&#34;</span>: <span style="color:#e6db74">&#34;7e0ce362-1530-497b-922f-54d4ac94beac&#34;</span>,
+    <span style="color:#f92672">&#34;merchant_id&#34;</span>: <span style="color:#e6db74">&#34;20685e44-1b26-4ed0-a5d6-b14733c55936&#34;</span>,
+    <span style="color:#f92672">&#34;store_id&#34;</span>: <span style="color:#e6db74">&#34;fabea80e-15db-4fa6-b553-3bd9605ab7a6&#34;</span>,
+    <span style="color:#f92672">&#34;store_sn&#34;</span>: <span style="color:#e6db74">&#34;21580000000524550&#34;</span>,
+    <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;接口测试(勿动)&#34;</span>,
+    <span style="color:#f92672">&#34;operator_id&#34;</span>: <span style="color:#e6db74">&#34;44b99475-a4b0-49de-bd4b-207e6a3bd815&#34;</span>,
+    <span style="color:#f92672">&#34;operator_name&#34;</span>: <span style="color:#e6db74">&#34;test&#34;</span>,
+    <span style="color:#f92672">&#34;@extended&#34;</span>: {
+        <span style="color:#f92672">&#34;label&#34;</span>: <span style="color:#e6db74">&#34;default_smart_clound_sound&#34;</span>
+    }
+}</code></pre></div>
+<p>然后在测试用例中以<code>D.default_smart_clound_sound</code>的方式取到该对象，看上去DataStore仅仅是是负责对json对象的反序列化？</p>
+
+<p><strong>肯定不是</strong></p>
+
+<h3 id="1-测试数据管理的痛点">1. 测试数据管理的痛点</h3>
+
+<p>测试数据肯定具备了业务语义，所以先来看下主要的一些支付场景下的业务对象：</p>
+
+<p><img src="http://my-storage.oss-cn-shanghai.aliyuncs.com/ipic/stjto.png" alt="" /></p>
+
+<p>很多时候，业务对象其实是树状结构，一层层级联下来，在这种结构下很容易设计出这样的测试数据：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+    <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;merchant&#34;</span>,
+    <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;merchant&#34;</span>,
+    <span style="color:#f92672">&#34;stores&#34;</span>: [
+        {
+            <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;store&#34;</span>,
+            <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;store a&#34;</span>,
+            <span style="color:#f92672">&#34;terminals&#34;</span>: [
+                {
+                	<span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;terminal&#34;</span>,
+                	<span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;terminal aa&#34;</span>
+                },
+                {
+                    <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;terminal&#34;</span>,
+                    <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;termial ab&#34;</span>
+                }
+            ]
+        },
+        <span style="color:#960050;background-color:#1e0010">...</span>
+    ]
+}</code></pre></div>
+<p>把所有数据放在一个大的json object下，一层层级联下来即可。</p>
+
+<p><strong>然而现实业务对象的关系没有简单，再看一个例子：</strong></p>
+
+<p><img src="http://my-storage.oss-cn-shanghai.aliyuncs.com/ipic/u2nm3.png" alt="" /></p>
+
+<p>这里面<code>Account</code>和<code>User</code>是两种不同的对象，<code>Account</code>里包含了登录时使用的<code>username</code>以及<code>password</code>字段，使用这两个字段在不同的平台下登录时却是不同的用户：<code>Group User</code>、<code>Merchant User</code></p>
+
+<p>另外  <code>merchant a</code>又跟<code>merchant user</code>有关联，又属于<code>group hm</code>，如果该对象只允许一次描述，似乎没有办法用json的数据结构来描述了。</p>
+
+<p>与其想尽办法设计出一种数据结构来解决上面的测试数据（对象）层级关系的表达，还不如承认：<strong>各个对象就应该是独立的，只是在一些维度上产生了联系</strong>。</p>
+
+<p>于是剩下的问题就成了『如何让不同的对象的在某个维度上发生联系？』</p>
+
+<h3 id="2-datastore介绍">2. DataStore介绍</h3>
+
+<p><code>hulk.datastore</code>下的<code>DataStore</code>对象负责存储、索引各种测试数据对象（<code>MetaData</code>），它提供多种查找对象的能力：</p>
+
+<ul>
+<li><code>find_obj_by_id</code>：根据对象的<code>id</code>字段查找，复杂度为O(1)</li>
+<li><code>find_obj_by_label</code>: 根据对象的标签字段<code>@extended.label</code>查找，复杂度为O(1)</li>
+<li><code>find_obj_by_group</code>：根据对象的分组字段<code>@extended.group</code>查找，复杂度为O(1)</li>
+<li><code>find_obj</code>： 根据对象的任意字段查找，比如<code>find_obj(name=&quot;自动化测试门店&quot;, sn=&quot;00000261001200200019186&quot;)</code></li>
+</ul>
+
+<p>上面的方法提供了检索对象的能力，然后看下如何建立对象之间的管理</p>
+
+<h4 id="2-1-一对一的关联">2.1 一对一的关联：</h4>
+
+<p>回到第一张对象关系图中，比如<strong>Store A</strong>，它所属的<code>Merchant</code>肯定是唯一的，这是种一对一的关系，在<code>DataStore</code>中用<code>LinkedAttr</code>来表述这层关系：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">LinkedAttr</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, attr_name):
+        <span style="color:#66d9ef">if</span> attr_name <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;&#34;</span>:
+            <span style="color:#66d9ef">raise</span> <span style="color:#a6e22e">ValueError</span>(<span style="color:#e6db74">&#34;disallowed empty attr name&#34;</span>)
+        self<span style="color:#f92672">.</span>attr_name <span style="color:#f92672">=</span> attr_name
+
+    <span style="color:#66d9ef">def</span> __get__(self, instance, owner):
+        data_store <span style="color:#f92672">=</span> getattr(instance, datastore_attr_name)
+        val <span style="color:#f92672">=</span> instance<span style="color:#f92672">.</span>__dict__[self<span style="color:#f92672">.</span>attr_name]
+        <span style="color:#66d9ef">for</span> f <span style="color:#f92672">in</span> (data_store<span style="color:#f92672">.</span>find_obj_by_id, data_store<span style="color:#f92672">.</span>find_obj_by_label, data_store<span style="color:#f92672">.</span>find_obj_by_group):
+            ret <span style="color:#f92672">=</span> f(val)
+            <span style="color:#66d9ef">if</span> ret <span style="color:#f92672">is</span> <span style="color:#f92672">not</span> None:
+                <span style="color:#66d9ef">return</span> ret
+
+    <span style="color:#66d9ef">def</span> __set__(self, instance, value):
+        instance<span style="color:#f92672">.</span>__dict__[self<span style="color:#f92672">.</span>attr_name] <span style="color:#f92672">=</span> value</code></pre></div>
+<p>这里不展开对<strong>描述符</strong>的解释，其中<code>__set__</code>实际了这样的表达式行为<code>store.merchant = &quot;123&quot;</code>，而<code>__get__</code>实现了<code>store.merchant</code>这样的行为。</p>
+
+<p>从两个方法的代码实现来看，当我给<code>__set__</code>传入<code>value=&quot;123&quot;</code>后，并没有特别魔幻的作用，只是修改了<code>obj_spec</code>的值。</p>
+
+<p>但是在取这个<code>merchant</code>值时（<code>__get__</code>），这个描述符并不是直接返回<code>123</code>，而是去datastore实例中，依次调用<code>find_obj_by_id</code>、<code>find_obj_by_label</code>、<code>find_obj_by_group</code>去返回具体的对象，也就是说这种一对一的关系，可以通过另外另外对象的<code>id</code>、<code>label</code>、<code>group</code>来建立联系，与关系型数据库中的外键概念非常接近。</p>
+
+<p>重新看下最上面的json数据，当我用<code>D.alternative_store.merchant</code>时，实际发生了这样的调用链：<code>find_obj_by_label(alternative_store) -&gt; find_obj_by_label(default_merchant)</code>，也就是说<code>D.alternative_store.merchant</code>与<code>D.default_merchant</code>实际指向了同一个对象。</p>
+
+<h4 id="2-2-一对多的关联">2.2 一对多的关联：</h4>
+
+<p>从store -&gt; merchant的映射是一对一，但是从merchant -&gt; store的映射却是一对多，这里用另外种描述符来解决这个问题：<code>GroupedAttr</code></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">GroupedAttr</span>(object):
+
+    <span style="color:#66d9ef">def</span> __init__(self, group_spec):
+        self<span style="color:#f92672">.</span>data_store <span style="color:#f92672">=</span> None
+        self<span style="color:#f92672">.</span>group_spec <span style="color:#f92672">=</span> group_spec
+
+    <span style="color:#66d9ef">def</span> __get__(self, instance, owner):
+        data_store <span style="color:#f92672">=</span> getattr(instance, datastore_attr_name)
+        ret <span style="color:#f92672">=</span> []
+        <span style="color:#66d9ef">for</span> g <span style="color:#f92672">in</span> instance<span style="color:#f92672">.</span>__dict__<span style="color:#f92672">.</span>get(self<span style="color:#f92672">.</span>attr_name, []):
+            <span style="color:#66d9ef">for</span> f <span style="color:#f92672">in</span> (data_store<span style="color:#f92672">.</span>find_obj_by_id, data_store<span style="color:#f92672">.</span>find_obj_by_label, data_store<span style="color:#f92672">.</span>find_obj_by_group):
+                s <span style="color:#f92672">=</span> f(g)
+                <span style="color:#66d9ef">if</span> s <span style="color:#f92672">is</span> <span style="color:#f92672">not</span> None:
+                    ret<span style="color:#f92672">.</span>append(s)
+                    <span style="color:#66d9ef">break</span>
+        <span style="color:#66d9ef">return</span> ret
+
+    <span style="color:#66d9ef">def</span> __set__(self, instance, value):
+        <span style="color:#66d9ef">if</span> instance<span style="color:#f92672">.</span>__dict__<span style="color:#f92672">.</span>get(self<span style="color:#f92672">.</span>attr_name, None) <span style="color:#f92672">is</span> None:
+            <span style="color:#66d9ef">if</span> isinstance(value, list) <span style="color:#f92672">or</span> isinstance(value, tuple):
+                instance<span style="color:#f92672">.</span>__dict__[self<span style="color:#f92672">.</span>attr_name] <span style="color:#f92672">=</span> value  <span style="color:#75715e"># value 是list或者tuple</span>
+            <span style="color:#66d9ef">else</span>:
+                instance<span style="color:#f92672">.</span>__dict__[self<span style="color:#f92672">.</span>attr_name] <span style="color:#f92672">=</span> [value]  <span style="color:#75715e"># value 是string</span>
+        <span style="color:#66d9ef">else</span>:
+            <span style="color:#66d9ef">if</span> isinstance(value, list) <span style="color:#f92672">or</span> isinstance(value, tuple):
+                instance<span style="color:#f92672">.</span>__dict__[self<span style="color:#f92672">.</span>attr_name]<span style="color:#f92672">.</span>extend(value)
+            <span style="color:#66d9ef">else</span>:
+                instance<span style="color:#f92672">.</span>__dict__[self<span style="color:#f92672">.</span>attr_name]<span style="color:#f92672">.</span>append(value)</code></pre></div>
+<p>其实行为与<code>LinkedAttr</code>类似</p>
+
+<h4 id="2-3-namespace">2.3 namespace</h4>
+
+<p>在大部分情况下，我们会利用对象的<code>label</code>去索引，这也要求了在<code>label</code>的值必须是全局唯一的。但当如果多个测试团队维护一份测试数据时，很难保证<code>label</code>不冲突，而且冲突的代价较大：会造成数据的混乱。</p>
+
+<p><code>namespace</code>可以在用户层面隔离数据，当你在测试数据中添加<code>@extended.namespace</code>字段后，必须要通过<code>D.namespace=&lt;namespace&gt;</code>切换至相应的namespace下才能访问。</p>
+
+<p>默认的<code>namespace</code>为main，而且在main下的对象可以在各个namespace下被访问到。</p>
+
+<p><strong>如果你的测试数据使用了不同的namespace，必须要在用例执行完成后切换回至main，可以利用pytest.fixture来实现。</strong></p>
+
+<h3 id="3-datafactory介绍">3. DataFactory介绍：</h3>
+
+<p>顾名思义，工厂类，负责将不同自定义json object序列化成Python对象，这层关系转换是通过<code>@object</code>来控制。</p>
+
+<p>比如在<code>hulk.data.__init__.py</code>下，加载了很多自定义的对象：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">DataHelper<span style="color:#f92672">.</span>update_obj_map({
+    <span style="color:#e6db74">&#34;merchant&#34;</span>: MerchantData,
+    <span style="color:#e6db74">&#34;store&#34;</span>: StoreData,
+    <span style="color:#e6db74">&#34;terminal&#34;</span>: TerminalData,
+    <span style="color:#e6db74">&#34;account&#34;</span>: AccountData,
+    <span style="color:#e6db74">&#34;activation code&#34;</span>: TerminalActivationCode,
+    <span style="color:#e6db74">&#34;vendor&#34;</span>: VendorData,
+    <span style="color:#e6db74">&#34;vendor_app&#34;</span>: VendorAppData,
+})</code></pre></div>
+<p>自定义Store对象：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">StoreData</span>(MetaData):
+    <span style="color:#e6db74">&#34;&#34;&#34;门店模型&#34;&#34;&#34;</span>
+    merchant <span style="color:#f92672">=</span> LinkedAttr(<span style="color:#e6db74">&#34;merchant&#34;</span>)
+    terminals <span style="color:#f92672">=</span> GroupedAttr(<span style="color:#e6db74">&#34;terminals&#34;</span>)
+    cashiers <span style="color:#f92672">=</span> GroupedAttr(<span style="color:#e6db74">&#34;cashiers&#34;</span>)
+    admins <span style="color:#f92672">=</span> GroupedAttr(<span style="color:#e6db74">&#34;admins&#34;</span>)
+
+    <span style="color:#a6e22e">@classmethod</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">inst_from_dict</span>(cls, d: dict):
+        instance <span style="color:#f92672">=</span> cls()
+        terminals <span style="color:#f92672">=</span> d<span style="color:#f92672">.</span>pop(<span style="color:#e6db74">&#34;terminals&#34;</span>, None)
+        cashiers <span style="color:#f92672">=</span> d<span style="color:#f92672">.</span>pop(<span style="color:#e6db74">&#34;cashiers&#34;</span>, None)
+        admins <span style="color:#f92672">=</span> d<span style="color:#f92672">.</span>pop(<span style="color:#e6db74">&#34;admins&#34;</span>, None)
+        <span style="color:#66d9ef">for</span> k, v <span style="color:#f92672">in</span> d<span style="color:#f92672">.</span>items():
+            setattr(instance, k, v)
+        <span style="color:#66d9ef">if</span> terminals:  
+            <span style="color:#66d9ef">for</span> terminal <span style="color:#f92672">in</span> terminals:  <span style="color:#75715e"># 历史原因</span>
+                instance<span style="color:#f92672">.</span>terminals <span style="color:#f92672">=</span> terminal
+        <span style="color:#66d9ef">if</span> cashiers:
+						instance<span style="color:#f92672">.</span>cashiers <span style="color:#f92672">=</span> cashiers   <span style="color:#75715e"># 推荐的赋值方法</span>
+        <span style="color:#66d9ef">if</span> admins:
+            instance<span style="color:#f92672">.</span>admins <span style="color:#f92672">=</span> admins
+        <span style="color:#66d9ef">return</span> instance</code></pre></div>
+<h3 id="4-总结-建议">4. 总结&amp;&amp;建议：</h3>
+
+<p>合理、有效的利用<code>LinkedAttr</code>、<code>GroupedAttr</code>关联不同对象，可以达到以下目的：</p>
+
+<ul>
+<li>一个业务对象能有完整的字段属性来描述</li>
+<li>一个业务对象有且仅会被描述一次，方便管理、维护</li>
+<li>可以任意定制、扩展对象间的关系链</li>
+<li>大量减少对测试数据的维护</li>
+<li>有效的利用namespace来隔离碎片化、低频的对象</li>
+</ul>
+        </div>
+
+        
+        
+        <div class="article-toc" style="display:none;">
+            <h3>Contents</h3>
+            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#1-测试数据管理的痛点">1. 测试数据管理的痛点</a></li>
+<li><a href="#2-datastore介绍">2. DataStore介绍</a>
+<ul>
+<li><a href="#2-1-一对一的关联">2.1 一对一的关联：</a></li>
+<li><a href="#2-2-一对多的关联">2.2 一对多的关联：</a></li>
+<li><a href="#2-3-namespace">2.3 namespace</a></li>
+</ul></li>
+<li><a href="#3-datafactory介绍">3. DataFactory介绍：</a></li>
+<li><a href="#4-总结-建议">4. 总结&amp;&amp;建议：</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+        </div>
+        
+        
+
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.slim.min.js" integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc=" crossorigin="anonymous"></script>
+        <script>
+            (function() {
+                var $toc = $('#TableOfContents');
+                if ($toc.length > 0) {
+                    var $window = $(window);
+
+                    function onScroll(){
+                        var currentScroll = $window.scrollTop();
+                        var h = $('.article-entry h1, .article-entry h2, .article-entry h3, .article-entry h4, .article-entry h5, .article-entry h6');
+                        var id = "";
+                        h.each(function (i, e) {
+                            e = $(e);
+                            if (e.offset().top - 10 <= currentScroll) {
+                                id = e.attr('id');
+                            }
+                        });
+                        var active = $toc.find('a.active');
+                        if (active.length == 1 && active.eq(0).attr('href') == '#' + id) return true;
+
+                        active.each(function (i, e) {
+                            $(e).removeClass('active').siblings('ul').hide();
+                        });
+                        $toc.find('a[href="#' + id + '"]').parentsUntil('#TableOfContents').each(function (i, e) {
+                            $(e).children('a').addClass('active').siblings('ul').show();
+                        });
+                    }
+
+                    $window.on('scroll', onScroll);
+                    $(document).ready(function() {
+                        $toc.find('a').parent('li').find('ul').hide();
+                        onScroll();
+                        document.getElementsByClassName('article-toc')[0].style.display = '';
+                    });
+                }
+            })();
+        </script>
+        
+
+        
+        <footer class="article-footer">
+            <ul class="article-tag-list">
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://blog.xuh.me//tags/%E6%8E%A5%E5%8F%A3%E6%B5%8B%E8%AF%95">接口测试
+                    </a>
+                </li>
+                
+            </ul>
+        </footer>
+        
+        <nav id="article-nav">
+    
+    
+    <a href="/posts/create-high-availability-kubernetes-cluster-on-aliyun/" id="article-nav-older" class="article-nav-link-wrap">
+        <div class="article-nav-title">在阿里云内搭建高可用的Kubernetes集群&nbsp;<span>&gt;</span></div>
+    </a>
+    
+</nav>
+
+
+        
+        <script src="https://utteranc.es/client.js"
+            repo="jacexh/comments"
+            issue-term="pathname"
+            label="blog"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+        </script>
+        
+    </div>
+</article>
+
+        
+    </section>
+    <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2019 jacexh
+            <br />
+            Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> with theme <a href="https://github.com/carsonip/hugo-theme-minos" target="_blank">Minos</a>
+        </div>
+    </div>
+    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark.min.css" integrity="sha256-GA29iW/iYj9FcuQQktvW45pRzHvZeFfgeFvA4tGVjpM=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js" integrity="sha256-aYTdUrn6Ow1DDgh5JTc3aDGnnju48y/1c8s1dgkYPQ8=" crossorigin="anonymous"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    
+    <script>
+        document.getElementById('main-nav-toggle').addEventListener('click', function () {
+            var header = document.getElementById('header');
+            if (header.classList.contains('mobile-on')) {
+                header.classList.remove('mobile-on');
+            } else {
+                header.classList.add('mobile-on');
+            }
+        });
+    </script>
+</footer>
+
+</div>
+</body>
+</html>

@@ -3,25 +3,36 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://blog.xuh.me/</loc>
-    <lastmod>2019-04-15T10:11:05+08:00</lastmod>
-    <priority>0</priority>
+    <loc>https://blog.xuh.me/posts/datastore-manuals/</loc>
+    <lastmod>2019-05-23T16:20:00+08:00</lastmod>
   </url>
   
   <url>
-    <loc>https://blog.xuh.me/tags/kubernetes/</loc>
-    <lastmod>2019-04-15T10:11:05+08:00</lastmod>
+    <loc>https://blog.xuh.me/</loc>
+    <lastmod>2019-05-23T16:20:00+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://blog.xuh.me/posts/</loc>
-    <lastmod>2019-04-15T10:11:05+08:00</lastmod>
+    <lastmod>2019-05-23T16:20:00+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://blog.xuh.me/tags/</loc>
+    <lastmod>2019-05-23T16:20:00+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.xuh.me/tags/%E6%8E%A5%E5%8F%A3%E6%B5%8B%E8%AF%95/</loc>
+    <lastmod>2019-05-23T16:20:00+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.xuh.me/tags/kubernetes/</loc>
     <lastmod>2019-04-15T10:11:05+08:00</lastmod>
     <priority>0</priority>
   </url>
@@ -80,12 +91,6 @@
   <url>
     <loc>https://blog.xuh.me/posts/api-testing-003/</loc>
     <lastmod>2018-05-29T09:01:07+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://blog.xuh.me/tags/%E6%8E%A5%E5%8F%A3%E6%B5%8B%E8%AF%95/</loc>
-    <lastmod>2018-05-29T09:01:07+08:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>

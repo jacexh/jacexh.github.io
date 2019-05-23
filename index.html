@@ -58,6 +58,81 @@
                 
                 
                 <header class="article-header">
+                    <h1 itemprop="name"><a class="article-title" href="/posts/datastore-manuals/">DataStore使用介绍</a></h1>
+                </header>
+                
+                <div class="article-meta">
+                    <a href="/posts/datastore-manuals/" class="article-date">
+                        <time datetime='2019-05-23T16:20:00.000&#43;08:00' itemprop="datePublished">2019-05-23</time>
+                    </a>
+                    
+                    
+                    
+                </div>
+                <div class="article-entry" itemprop="articleBody">
+                    <p>
+                        
+                    <p>在测试框架的<code>data</code>目录下有<code>test.json</code>、<code>test2.json</code>两份文件，用于存放test、test2环境的静态测试数据，比如：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+    <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#e6db74">&#34;581e3432-9f03-0ae3-ddc5-d197601c6850&#34;</span>,
+    <span style="color:#f92672">&#34;sn&#34;</span>: <span style="color:#e6db74">&#34;00000261001200200019186&#34;</span>,
+    <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;自动化测试门店&#34;</span>,
+    <span style="color:#f92672">&#34;industry&#34;</span>: <span style="color:#e6db74">&#34;e586aa25-312d-11e6-aebb-ecf4bbdee2f0&#34;</span>,
+    <span style="color:#f92672">&#34;address&#34;</span>: [<span style="color:#e6db74">&#34;江苏省&#34;</span>, <span style="color:#e6db74">&#34;苏州市&#34;</span>, <span style="color:#e6db74">&#34;姑苏区&#34;</span>, <span style="color:#e6db74">&#34;东长路88号&#34;</span>],
+    <span style="color:#f92672">&#34;merchant&#34;</span>: <span style="color:#e6db74">&#34;default_merchant&#34;</span>,
+    <span style="color:#f92672">&#34;contact_name&#34;</span>: <span style="color:#e6db74">&#34;徐豪&#34;</span>,
+    <span style="color:#f92672">&#34;contact_cellphone&#34;</span>: <span style="color:#e6db74">&#34;10088880001&#34;</span>,
+    <span style="color:#f92672">&#34;cashiers&#34;</span>: [<span style="color:#e6db74">&#34;default_cashier&#34;</span>],
+    <span style="color:#f92672">&#34;admins&#34;</span>: [<span style="color:#e6db74">&#34;default_admin&#34;</span>],
+    <span style="color:#f92672">&#34;@object&#34;</span>: <span style="color:#e6db74">&#34;store&#34;</span>,
+    <span style="color:#f92672">&#34;@extended&#34;</span>: {
+        <span style="color:#f92672">&#34;label&#34;</span>: <span style="color:#e6db74">&#34;default_store&#34;</span>,
+        <span style="color:#f92672">&#34;group&#34;</span>: <span style="color:#e6db74">&#34;store&#34;</span>
+    }
+}<span style="color:#960050;background-color:#1e0010">,</span>
+{
+    <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#e6db74">&#34;5c82b3f9-e5d2-4e21-ab4b-800d6c7b7265&#34;</span>,
+    <span style="color:#f92672">&#34;sn&#34;</span>: <span style="color:#e6db74">&#34;1580000000517499&#34;</span>,
+    <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;无锡办事处&#34;</span>,
+    <span style="color:#f92672">&#34;industry&#34;</span>: <span style="color:#e6db74">&#34;e586aa25-312d-11e6-aebb-ecf4bbdee2f0&#34;</span>,
+    <span style="color:#f92672">&#34;address&#34;</span>: [<span style="color:#e6db74">&#34;江苏省&#34;</span>, <span style="color:#e6db74">&#34;无锡市&#34;</span>, <span style="color:#e6db74">&#34;崇安区&#34;</span>, <span style="color:#e6db74">&#34;湖滨大道99号&#34;</span>],
+    <span style="color:#f92672">&#34;contact_name&#34;</span>: <span style="color:#e6db74">&#34;Bill Smith&#34;</span>,
+    <span style="color:#f92672">&#34;contact_cellphone&#34;</span>: <span style="color:#e6db74">&#34;10088880002&#34;</span>,
+    <span style="color:#f92672">&#34;merchant&#34;</span>: <span style="color:#e6db74">&#34;default_merchant&#34;</span>,
+    <span style="color:#f92672">&#34;admins&#34;</span>: [<span style="color:#e6db74">&#34;alternative_admin&#34;</span>],
+    <span style="color:#f92672">&#34;cashiers&#34;</span>: [<span style="color:#e6db74">&#34;alternative_cashier&#34;</span>],
+    <span style="color:#f92672">&#34;@object&#34;</span>: <span style="color:#e6db74">&#34;store&#34;</span>,
+    <span style="color:#f92672">&#34;@extended&#34;</span>: {
+        <span style="color:#f92672">&#34;label&#34;</span>: <span style="color:#e6db74">&#34;alternative_store&#34;</span>,
+        <span style="color:#f92672">&#34;group&#34;</span>: <span style="color:#e6db74">&#34;store&#34;</span>
+    }
+}</code></pre></div>
+                    </p>
+                    <p class="article-more-link">
+                        <a href="/posts/datastore-manuals/">Read More</a>
+                    </p>
+                </div>
+
+                
+                <footer class="article-footer">
+                    <ul class="article-tag-list">
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/%E6%8E%A5%E5%8F%A3%E6%B5%8B%E8%AF%95">接口测试
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </footer>
+                
+            </div>
+        </article>
+        
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+            <div class="article-inner">
+                
+                
+                <header class="article-header">
                     <h1 itemprop="name"><a class="article-title" href="/posts/create-high-availability-kubernetes-cluster-on-aliyun/">在阿里云内搭建高可用的Kubernetes集群</a></h1>
                 </header>
                 
@@ -299,62 +374,6 @@
                     </p>
                     <p class="article-more-link">
                         <a href="/posts/api-testing-003/">Read More</a>
-                    </p>
-                </div>
-
-                
-                <footer class="article-footer">
-                    <ul class="article-tag-list">
-                        
-                        <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/python">Python
-                            </a>
-                        </li>
-                        
-                        <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/%E6%8E%A5%E5%8F%A3%E6%B5%8B%E8%AF%95">接口测试
-                            </a>
-                        </li>
-                        
-                    </ul>
-                </footer>
-                
-            </div>
-        </article>
-        
-        <article class="article article-type-post" itemscope itemprop="blogPost">
-            <div class="article-inner">
-                
-                
-                <header class="article-header">
-                    <h1 itemprop="name"><a class="article-title" href="/posts/api-testing-002/">Python接口测试实战02 - 接口测试的本质</a></h1>
-                </header>
-                
-                <div class="article-meta">
-                    <a href="/posts/api-testing-002/" class="article-date">
-                        <time datetime='2018-05-20T08:53:34.000&#43;08:00' itemprop="datePublished">2018-05-20</time>
-                    </a>
-                    
-                    
-                    
-                </div>
-                <div class="article-entry" itemprop="articleBody">
-                    <p>
-                        
-                    <p>在上一篇简单的介绍了接口测试里用到的工具、类库后，本篇正式开始讲用Python进行接口测试实战。</p>
-
-<h3 id="1-从一个登录接口了解接口调用的方法">1. 从一个登录接口了解接口调用的方法</h3>
-
-<p>现在假设有一个登录接口<code>POST /api/login</code>，该接口有两个入参<code>username</code>和<code>password</code>，分别表示帐号的用户名以及密码，那该如何调用该接口呢？</p>
-
-<p><em>以下该登录接口都以一个临时的url:<a href="http://requestbin.qahub.net/z3m6v8z3来替代">http://requestbin.qahub.net/z3m6v8z3来替代</a></em></p>
-
-<h4 id="1-1-curl做接口调用">1.1 curl做接口调用：</h4>
-
-<p>先用curl来做一个简单的例子：</p>
-                    </p>
-                    <p class="article-more-link">
-                        <a href="/posts/api-testing-002/">Read More</a>
                     </p>
                 </div>
 
