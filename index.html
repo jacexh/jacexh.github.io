@@ -58,6 +58,70 @@
                 
                 
                 <header class="article-header">
+                    <h1 itemprop="name"><a class="article-title" href="/posts/api-testing-004/">Python接口测试实战4 - 封装redmine接口</a></h1>
+                </header>
+                
+                <div class="article-meta">
+                    <a href="/posts/api-testing-004/" class="article-date">
+                        <time datetime='2019-06-03T17:29:07.000&#43;08:00' itemprop="datePublished">2019-06-03</time>
+                    </a>
+                    
+                    
+                    
+                </div>
+                <div class="article-entry" itemprop="articleBody">
+                    <p>
+                        
+                    为了更好的演示接口测试，笔者部署了一个Redmine服务，本系列文章均以该系统作为被测试服务，当然你也可以自己搭建一个redmine系统，可以利用docker快速部署：https://hub.docker.com/_/redmine
+ [TOC]
+1. 接口文档 接口文档是进行接口测试的必要输入，一份好的接口文档笔者认为需要包含以下要素：
+ 接口的鉴权方法 接口的调用时序 接口的必传、可选参数，以及各参数的语义 接口响应报文，以及相关字段语义 接口请求、响应报文demo  因为我这里使用了redmine，其官方接口文档地址如下：https://www.redmine.org/projects/redmine/wiki/Rest_api
+除了传统的手写接口文档，目前还有一些好用的接口文档框架，比如著名的Swagger: https://swagger.io/ 以及国内的YApi: https://yapi.ymfe.org
+如果你所在的团队、部门准备开始着手接口自动化测试，而开发又无法提供接口文档，建议尽快跟开发负责人协商
+2. 理解接口行为 我们首先确定用来练习的接口：https://www.redmine.org/projects/redmine/wiki/Rest_Issues#Listing-issues
+该接口返回满足匹配条件的issue列表，所有参数都可以认为是可选参数；另外redmine的接口响应报文提供两种格式：json以及xml，
+所以最简单的调用方式是/issues.json
+2.1 鉴权方式 在postman上调用/issue.json看上去没有问题，但是返回的数据是空的：
+ 有可能是的确不存在任何issue，自然也就返回了空的数据 调用方权限问题：没有权限获取资源对象  经确认响应接口为空属于上面第二点原因，未通过服务器鉴权，会认为调用方会匿名用户，无权限。
+回到文档的鉴权章节：https://www.redmine.org/projects/redmine/wiki/Rest_api#Authentication ，我们可以看到redmine提供三种鉴权方式：
+ 把用户key作为query string传入，参数名为key 将用户名、密码以HTTP Basic authentication的方式带上 把用户key以http请求头的方式带入，参数名为X-Redmine-API-Key  我这里选用第三种方式，使用postman验证下响应报文：
+跟第一次调用相比，这次不再返回一个空数据了，而是真实返回了该用户所能查看到的所有issue。
+2.2 可选参数 这次我们再尝试下传入可选参数，/issue.json的可选参数相当多，我这里假设调用目标为：返回项目1下的所有issue，响应结果按照issue创建时间升序排列
+3. 接口封装 基于postman的三次调试，我们其实已经基本了解该接口的行为：
+ 需要鉴权 无必传参数 响应结果视作json，xml处理相对麻烦  所以我们可以着手第一版封装：
+def list_issues(api_key, **kwargs): &#34;&#34;&#34;按条件查询issue&#34;&#34;&#34; return requests.get(&#34;http://redmine.xuh.me/issues.json&#34;, params=kwargs, headers={&#34;X-Redmine-API-Key&#34;: api_key}).text 然后调试代码：
+&gt;&gt;&gt; print(list_issues(&#34;490592ea4e46348df29828edd597acbfdc5ebb4a&#34;)) {&#34;issues&#34;:[{&#34;id&#34;:2,&#34;project&#34;:{&#34;id&#34;:1,&#34;name&#34;:&#34;接口测试实战&#34;},&#34;tracker&#34;:{&#34;id&#34;:3,&#34;name&#34;:&#34;支持&#34;},&#34;status&#34;:{&#34;id&#34;:1,&#34;name&#34;:&#34;新建&#34;},&#34;p .
+                    </p>
+                    <p class="article-more-link">
+                        <a href="/posts/api-testing-004/">Read More</a>
+                    </p>
+                </div>
+
+                
+                <footer class="article-footer">
+                    <ul class="article-tag-list">
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/python">Python
+                            </a>
+                        </li>
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/%E6%8E%A5%E5%8F%A3%E6%B5%8B%E8%AF%95">接口测试
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </footer>
+                
+            </div>
+        </article>
+        
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+            <div class="article-inner">
+                
+                
+                <header class="article-header">
                     <h1 itemprop="name"><a class="article-title" href="/posts/datastore-manuals/">DataStore使用介绍</a></h1>
                 </header>
                 
@@ -347,56 +411,6 @@
             </div>
         </article>
         
-        <article class="article article-type-post" itemscope itemprop="blogPost">
-            <div class="article-inner">
-                
-                
-                <header class="article-header">
-                    <h1 itemprop="name"><a class="article-title" href="/posts/api-testing-003/">Python接口测试实战3 - 接口封装的基石：requests.Session</a></h1>
-                </header>
-                
-                <div class="article-meta">
-                    <a href="/posts/api-testing-003/" class="article-date">
-                        <time datetime='2018-05-29T09:01:07.000&#43;08:00' itemprop="datePublished">2018-05-29</time>
-                    </a>
-                    
-                    
-                    
-                </div>
-                <div class="article-entry" itemprop="articleBody">
-                    <p>
-                        
-                    <p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20190419090155.png" alt="" /></p>
-
-<p>笔者在面试候选人的时候，如果恰巧对方使用过<code>requests</code>库，一般会问一个问题：谈一下你对<code>requests.Session</code>对象的理解？</p>
-
-<p>一个很简单的问题，但印象中几乎没有候选人回答上来过，而且很多人在使用<code>requests</code>做接口测试，但居然不知道<code>Session</code>这个对象，这让我有点匪夷所思。</p>
-                    </p>
-                    <p class="article-more-link">
-                        <a href="/posts/api-testing-003/">Read More</a>
-                    </p>
-                </div>
-
-                
-                <footer class="article-footer">
-                    <ul class="article-tag-list">
-                        
-                        <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/python">Python
-                            </a>
-                        </li>
-                        
-                        <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="https://blog.xuh.me//tags/%E6%8E%A5%E5%8F%A3%E6%B5%8B%E8%AF%95">接口测试
-                            </a>
-                        </li>
-                        
-                    </ul>
-                </footer>
-                
-            </div>
-        </article>
-        
 
         
 
@@ -409,6 +423,10 @@
     
     
     <a href="/page/2/">2</a>
+    
+    
+    
+    <a href="/page/3/">3</a>
     
     
 

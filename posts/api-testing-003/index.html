@@ -77,10 +77,10 @@
 
 <p>难道一般的接口测试中用不到这个对象？非也，让我们配合着源码来看这段简单的代码： <code>requests.get(&quot;http://www.baidu.com&quot;)</code></p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get</span>(url, params<span style="color:#f92672">=</span>None, <span style="color:#f92672">**</span>kwargs):
-    <span style="color:#e6db74">r</span><span style="color:#e6db74">&#34;&#34;&#34;Sends a GET request.
+    <span style="color:#e6db74">&#34;&#34;&#34;Sends a GET request.
 </span><span style="color:#e6db74">    ...
 </span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
-    <span style="color:#66d9ef">return</span> request(<span style="color:#e6db74">&#39;get&#39;</span>, url, params<span style="color:#f92672">=</span>params, <span style="color:#f92672">**</span>kwargs)</code></pre></div>
+    <span style="color:#66d9ef">return</span> requests<span style="color:#f92672">.</span>request(<span style="color:#e6db74">&#39;get&#39;</span>, url, params<span style="color:#f92672">=</span>params, <span style="color:#f92672">**</span>kwargs)</code></pre></div>
 <p>然后再翻查下<code>requests.requst</code>这个函数：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">request</span>(method, url, <span style="color:#f92672">**</span>kwargs):
     <span style="color:#e6db74">&#34;&#34;&#34;Constructs and sends a :class:`Request &lt;Request&gt;`.

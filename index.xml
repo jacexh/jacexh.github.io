@@ -9,10 +9,37 @@
     <managingEditor>jace.xh@gmail.com (jacexh)</managingEditor>
     <webMaster>jace.xh@gmail.com (jacexh)</webMaster>
     <copyright>xuh.me — All rights reserved.</copyright>
-    <lastBuildDate>Thu, 23 May 2019 16:20:00 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 03 Jun 2019 17:29:07 +0800</lastBuildDate>
     
 	<atom:link href="https://blog.xuh.me/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Python接口测试实战4 - 封装redmine接口</title>
+      <link>https://blog.xuh.me/posts/api-testing-004/</link>
+      <pubDate>Mon, 03 Jun 2019 17:29:07 +0800</pubDate>
+      <author>jace.xh@gmail.com (jacexh)</author>
+      <guid>https://blog.xuh.me/posts/api-testing-004/</guid>
+      <description>为了更好的演示接口测试，笔者部署了一个Redmine服务，本系列文章均以该系统作为被测试服务，当然你也可以自己搭建一个redmine系统，可以利用docker快速部署：https://hub.docker.com/_/redmine
+ [TOC]
+1. 接口文档 接口文档是进行接口测试的必要输入，一份好的接口文档笔者认为需要包含以下要素：
+ 接口的鉴权方法 接口的调用时序 接口的必传、可选参数，以及各参数的语义 接口响应报文，以及相关字段语义 接口请求、响应报文demo  因为我这里使用了redmine，其官方接口文档地址如下：https://www.redmine.org/projects/redmine/wiki/Rest_api
+除了传统的手写接口文档，目前还有一些好用的接口文档框架，比如著名的Swagger: https://swagger.io/ 以及国内的YApi: https://yapi.ymfe.org
+如果你所在的团队、部门准备开始着手接口自动化测试，而开发又无法提供接口文档，建议尽快跟开发负责人协商
+2. 理解接口行为 我们首先确定用来练习的接口：https://www.redmine.org/projects/redmine/wiki/Rest_Issues#Listing-issues
+该接口返回满足匹配条件的issue列表，所有参数都可以认为是可选参数；另外redmine的接口响应报文提供两种格式：json以及xml，
+所以最简单的调用方式是/issues.json
+2.1 鉴权方式 在postman上调用/issue.json看上去没有问题，但是返回的数据是空的：
+ 有可能是的确不存在任何issue，自然也就返回了空的数据 调用方权限问题：没有权限获取资源对象  经确认响应接口为空属于上面第二点原因，未通过服务器鉴权，会认为调用方会匿名用户，无权限。
+回到文档的鉴权章节：https://www.redmine.org/projects/redmine/wiki/Rest_api#Authentication ，我们可以看到redmine提供三种鉴权方式：
+ 把用户key作为query string传入，参数名为key 将用户名、密码以HTTP Basic authentication的方式带上 把用户key以http请求头的方式带入，参数名为X-Redmine-API-Key  我这里选用第三种方式，使用postman验证下响应报文：
+跟第一次调用相比，这次不再返回一个空数据了，而是真实返回了该用户所能查看到的所有issue。
+2.2 可选参数 这次我们再尝试下传入可选参数，/issue.json的可选参数相当多，我这里假设调用目标为：返回项目1下的所有issue，响应结果按照issue创建时间升序排列
+3. 接口封装 基于postman的三次调试，我们其实已经基本了解该接口的行为：
+ 需要鉴权 无必传参数 响应结果视作json，xml处理相对麻烦  所以我们可以着手第一版封装：
+def list_issues(api_key, **kwargs): &amp;#34;&amp;#34;&amp;#34;按条件查询issue&amp;#34;&amp;#34;&amp;#34; return requests.get(&amp;#34;http://redmine.xuh.me/issues.json&amp;#34;, params=kwargs, headers={&amp;#34;X-Redmine-API-Key&amp;#34;: api_key}).text 然后调试代码：
+&amp;gt;&amp;gt;&amp;gt; print(list_issues(&amp;#34;490592ea4e46348df29828edd597acbfdc5ebb4a&amp;#34;)) {&amp;#34;issues&amp;#34;:[{&amp;#34;id&amp;#34;:2,&amp;#34;project&amp;#34;:{&amp;#34;id&amp;#34;:1,&amp;#34;name&amp;#34;:&amp;#34;接口测试实战&amp;#34;},&amp;#34;tracker&amp;#34;:{&amp;#34;id&amp;#34;:3,&amp;#34;name&amp;#34;:&amp;#34;支持&amp;#34;},&amp;#34;status&amp;#34;:{&amp;#34;id&amp;#34;:1,&amp;#34;name&amp;#34;:&amp;#34;新建&amp;#34;},&amp;#34;p .</description>
+    </item>
     
     <item>
       <title>DataStore使用介绍</title>
