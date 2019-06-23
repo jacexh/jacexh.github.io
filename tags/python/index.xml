@@ -9,10 +9,29 @@
     <managingEditor>jace.xh@gmail.com (jacexh)</managingEditor>
     <webMaster>jace.xh@gmail.com (jacexh)</webMaster>
     <copyright>xuh.me — All rights reserved.</copyright>
-    <lastBuildDate>Mon, 03 Jun 2019 17:29:07 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 23 Jun 2019 09:15:07 +0800</lastBuildDate>
     
 	<atom:link href="https://blog.xuh.me/tags/python/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Python接口测试实战5 - 面向服务封装</title>
+      <link>https://blog.xuh.me/posts/api-testing-005/</link>
+      <pubDate>Sun, 23 Jun 2019 09:15:07 +0800</pubDate>
+      <author>jace.xh@gmail.com (jacexh)</author>
+      <guid>https://blog.xuh.me/posts/api-testing-005/</guid>
+      <description>&lt;p&gt;上一篇我们封装了&lt;code&gt;def list_issues()&lt;/code&gt;接口，在这一节正式开讲前，我们以同样的方法封装另外个接口：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# https://www.redmine.org/projects/redmine/wiki/Rest_Issues#Listing-issues&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;list_issues&lt;/span&gt;(api_key, &lt;span style=&#34;color:#f92672&#34;&gt;**&lt;/span&gt;kwargs):
+  &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;#34;&amp;#34;按条件查询issue&amp;#34;&amp;#34;&amp;#34;&lt;/span&gt;
+  &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; requests&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;get(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://redmine.xuh.me/issues.json&amp;#34;&lt;/span&gt;, params&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;kwargs, headers&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;{&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;X-Redmine-API-Key&amp;#34;&lt;/span&gt;: api_key})&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;text
+
+
+&lt;span style=&#34;color:#75715e&#34;&gt;# https://www.redmine.org/projects/redmine/wiki/Rest_Issues#Showing-an-issue&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;get_issue&lt;/span&gt;(api_key, issue_id, &lt;span style=&#34;color:#f92672&#34;&gt;**&lt;/span&gt;kwargs):
+  &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;#34;&amp;#34;根据issue_id获取issue详情&amp;#34;&amp;#34;&amp;#34;&lt;/span&gt;
+  &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; requests&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;get(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://redmine.xuh.me/issues/{}.json&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;format(issue_id), params&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;kwargs, headers&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;{&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;X-Redmine-API-Key&amp;#34;&lt;/span&gt;: api_key})&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;text&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+    </item>
     
     <item>
       <title>Python接口测试实战4 - 封装redmine接口</title>

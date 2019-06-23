@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Python接口测试实战5 - 面向服务封装 // Jace&#39;s Blog</title>
+
+        <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+        <meta property="og:title" content="Python接口测试实战5 - 面向服务封装" />
+    <meta property="og:description" content="" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://blog.xuh.me/posts/api-testing-005/" />
+    
+
+    <link href="" rel="alternate" type="application/rss+xml" title="Jace&#39;s Blog" />
+    <link rel="shortcut icon" href="/favicon.png">
+
+    <link href="https://blog.xuh.me/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+    <link href="https://blog.xuh.me/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="https://blog.xuh.me/css/style.css">
+
+    <meta name="generator" content="Hugo 0.55.3" />
+</head>
+
+
+<body>
+<div id="container">
+    <header id="header">
+    <div id="header-outer" class="outer">
+        <div id="header-inner" class="inner">
+            <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+            <a id="logo" class="logo-text" href="https://blog.xuh.me/">Jace&#39;s Blog</a>
+            <nav id="main-nav">
+                
+                <a class="main-nav-link" href="/">Home</a>
+                
+                <a class="main-nav-link" href="/posts">Posts</a>
+                
+                <a class="main-nav-link" href="/tags">Tags</a>
+                
+            </nav>
+            <nav id="sub-nav">
+                <div id="search-form-wrap">
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+
+    <section id="main" class="outer">
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        <header class="article-header">
+            <h1 class="article-title" itemprop="name">Python接口测试实战5 - 面向服务封装</h1>
+        </header>
+        
+        <div class="article-meta">
+            <a href="/posts/api-testing-005/" class="article-date">
+                <time datetime='2019-06-23T09:15:07.000&#43;08:00' itemprop="datePublished">2019-06-23</time>
+            </a>
+            
+            
+            
+        </div>
+        <div class="article-entry" itemprop="articleBody">
+            <p>上一篇我们封装了<code>def list_issues()</code>接口，在这一节正式开讲前，我们以同样的方法封装另外个接口：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># https://www.redmine.org/projects/redmine/wiki/Rest_Issues#Listing-issues</span>
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">list_issues</span>(api_key, <span style="color:#f92672">**</span>kwargs):
+  <span style="color:#e6db74">&#34;&#34;&#34;按条件查询issue&#34;&#34;&#34;</span>
+  <span style="color:#66d9ef">return</span> requests<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;http://redmine.xuh.me/issues.json&#34;</span>, params<span style="color:#f92672">=</span>kwargs, headers<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#34;X-Redmine-API-Key&#34;</span>: api_key})<span style="color:#f92672">.</span>text
+
+
+<span style="color:#75715e"># https://www.redmine.org/projects/redmine/wiki/Rest_Issues#Showing-an-issue</span>
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_issue</span>(api_key, issue_id, <span style="color:#f92672">**</span>kwargs):
+  <span style="color:#e6db74">&#34;&#34;&#34;根据issue_id获取issue详情&#34;&#34;&#34;</span>
+  <span style="color:#66d9ef">return</span> requests<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;http://redmine.xuh.me/issues/{}.json&#34;</span><span style="color:#f92672">.</span>format(issue_id), params<span style="color:#f92672">=</span>kwargs, headers<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#34;X-Redmine-API-Key&#34;</span>: api_key})<span style="color:#f92672">.</span>text</code></pre></div>
+<p>可以看到，封装的两个函数有很多问题：</p>
+
+<ul>
+<li>服务的入口地址一致，均为 <code>http://redmine.xuh.me</code></li>
+<li><code>api_key</code>与接口逻辑无关，但每次封装都得带入</li>
+<li>HTTP连接并未复用：直接调用了<code>requests.request</code>，导致每次接口调用都要进行TCP三次握手建链，性能不高</li>
+</ul>
+
+<h2 id="面向服务封装">面向服务封装</h2>
+
+<p>基于上面的问题，以及考虑到测试人员会额外面对的另以个问题：同一个服务在不同环境（开发/测试/预发布等）的访问入口有区别，我这里提出了一个封装原则：<strong>面向服务封装</strong></p>
+
+<ul>
+<li>服务可以狭义的理解为一个服务实例，也可以是共享一个访问入口的服务实例群</li>
+<li>服务以<code>Class</code>的形态存在，接口的形式则为类内的方法</li>
+<li><code>Class</code>的实现上应当复用TCP连接，即大多数情况下，应当使用同一<code>requests.Session</code>对象</li>
+<li>用户鉴权、数字签名等非接口语义的行为应当尽可能抽取出来</li>
+<li>封装方法的函数签名应当尽可能逼近终端用户的使用理解</li>
+</ul>
+
+<p>在理解了以上原则后，看下我会怎么封装redmine的接口：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">RedmineClient</span>:
+
+    <span style="color:#66d9ef">def</span> __init__(self, base_url, api_key<span style="color:#f92672">=</span>None):
+        self<span style="color:#f92672">.</span>base_url <span style="color:#f92672">=</span> base_url  <span style="color:#75715e"># 服务入口地址，不同环境入口地址不同</span>
+        self<span style="color:#f92672">.</span>api_key <span style="color:#f92672">=</span> api_key
+        self<span style="color:#f92672">.</span>session <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>Session()
+
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">list_issue</span>(self, <span style="color:#f92672">**</span>kwargs):
+        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>session<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;{}/issues.json&#34;</span><span style="color:#f92672">.</span>format(self<span style="color:#f92672">.</span>base_url), params<span style="color:#f92672">=</span>kwargs, headers<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#34;X-Redmine-API-Key&#34;</span>: self<span style="color:#f92672">.</span>api_key})<span style="color:#f92672">.</span>text
+
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_issue</span>(self, issue_id, <span style="color:#f92672">**</span>kwargs):
+        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>session<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;{}/issues/{}.json&#34;</span><span style="color:#f92672">.</span>format(self<span style="color:#f92672">.</span>base_url, issue_id), params<span style="color:#f92672">=</span>kwargs, headers<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#34;X-Redmine-API-key&#34;</span>: self<span style="color:#f92672">.</span>api_key})<span style="color:#f92672">.</span>text</code></pre></div>
+<p>然后实例化这个Client: <code>client = RedmineClient(&quot;http://redmine.xuh.me&quot;, &quot;490592ea4e46348df29828edd597acbfdc5ebb4a&quot;)</code>，调用下上面两个接口看下：</p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20190623100252.png" alt="" /></p>
+
+<p>如果你对前后两个版本的封装进行时间打点的话，你会发现维护一个<code>Session</code>对象来调用接口的话，除了第一次稍慢（TCP建链），之后的响应时间会节省不少，远远优于直接使用<code>requests.request</code></p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20190623100747.png" alt="" /></p>
+
+<p>本节到此就差不多结束了，<code>RedmineClass</code>内部的实现其实还有很多优化的余地，之后会陆续讲到。下一节会重点讲如果到响应报文进行提取、断言，</p>
+        </div>
+
+        
+        
+        <div class="article-toc" style="display:none;">
+            <h3>Contents</h3>
+            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#面向服务封装">面向服务封装</a></li>
+</ul></li>
+</ul>
+</nav>
+        </div>
+        
+        
+
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.slim.min.js" integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc=" crossorigin="anonymous"></script>
+        <script>
+            (function() {
+                var $toc = $('#TableOfContents');
+                if ($toc.length > 0) {
+                    var $window = $(window);
+
+                    function onScroll(){
+                        var currentScroll = $window.scrollTop();
+                        var h = $('.article-entry h1, .article-entry h2, .article-entry h3, .article-entry h4, .article-entry h5, .article-entry h6');
+                        var id = "";
+                        h.each(function (i, e) {
+                            e = $(e);
+                            if (e.offset().top - 10 <= currentScroll) {
+                                id = e.attr('id');
+                            }
+                        });
+                        var active = $toc.find('a.active');
+                        if (active.length == 1 && active.eq(0).attr('href') == '#' + id) return true;
+
+                        active.each(function (i, e) {
+                            $(e).removeClass('active').siblings('ul').hide();
+                        });
+                        $toc.find('a[href="#' + id + '"]').parentsUntil('#TableOfContents').each(function (i, e) {
+                            $(e).children('a').addClass('active').siblings('ul').show();
+                        });
+                    }
+
+                    $window.on('scroll', onScroll);
+                    $(document).ready(function() {
+                        $toc.find('a').parent('li').find('ul').hide();
+                        onScroll();
+                        document.getElementsByClassName('article-toc')[0].style.display = '';
+                    });
+                }
+            })();
+        </script>
+        
+
+        
+        <footer class="article-footer">
+            <ul class="article-tag-list">
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://blog.xuh.me//tags/python">Python
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://blog.xuh.me//tags/%E6%8E%A5%E5%8F%A3%E6%B5%8B%E8%AF%95">接口测试
+                    </a>
+                </li>
+                
+            </ul>
+        </footer>
+        
+        <nav id="article-nav">
+    
+    
+    <a href="/posts/api-testing-004/" id="article-nav-older" class="article-nav-link-wrap">
+        <div class="article-nav-title">Python接口测试实战4 - 封装redmine接口&nbsp;<span>&gt;</span></div>
+    </a>
+    
+</nav>
+
+
+        
+        <script src="https://utteranc.es/client.js"
+            repo="jacexh/comments"
+            issue-term="pathname"
+            label="blog"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+        </script>
+        
+    </div>
+</article>
+
+        
+    </section>
+    <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2019 jacexh
+            <br />
+            Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> with theme <a href="https://github.com/carsonip/hugo-theme-minos" target="_blank">Minos</a>
+        </div>
+    </div>
+    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark.min.css" integrity="sha256-GA29iW/iYj9FcuQQktvW45pRzHvZeFfgeFvA4tGVjpM=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js" integrity="sha256-aYTdUrn6Ow1DDgh5JTc3aDGnnju48y/1c8s1dgkYPQ8=" crossorigin="anonymous"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    
+    <script>
+        document.getElementById('main-nav-toggle').addEventListener('click', function () {
+            var header = document.getElementById('header');
+            if (header.classList.contains('mobile-on')) {
+                header.classList.remove('mobile-on');
+            } else {
+                header.classList.add('mobile-on');
+            }
+        });
+    </script>
+</footer>
+
+</div>
+</body>
+</html>
