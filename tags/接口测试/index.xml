@@ -9,10 +9,32 @@
     <managingEditor>jace.xh@gmail.com (jacexh)</managingEditor>
     <webMaster>jace.xh@gmail.com (jacexh)</webMaster>
     <copyright>xuh.me — All rights reserved.</copyright>
-    <lastBuildDate>Sun, 23 Jun 2019 09:15:07 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 24 Jun 2019 09:15:07 +0800</lastBuildDate>
     
 	<atom:link href="https://blog.xuh.me/tags/%E6%8E%A5%E5%8F%A3%E6%B5%8B%E8%AF%95/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Python接口测试实战6 - 序列化与反序列化</title>
+      <link>https://blog.xuh.me/posts/api-testing-006/</link>
+      <pubDate>Mon, 24 Jun 2019 09:15:07 +0800</pubDate>
+      <author>jace.xh@gmail.com (jacexh)</author>
+      <guid>https://blog.xuh.me/posts/api-testing-006/</guid>
+      <description>理解什么是序列化 在我面试有接口测试经验的候选人的时候，经常会问一个问题：如何对返回的响应结果（假设json格式）中的字段值进行断言？我一般得到的答复是通过正则表达式，有一部分候选人会说使用JSON Path，这就是让我非常困惑的一个地方：好像大部分测试人员都不知道序列化和反序列化这种重要的基础概念。
+我以一个例子来展开：
+class Student: def __init__(self, name, age, *courses): self.name = name self.age = age self.courses = courses mike = Student(&amp;#34;Mike Hsu&amp;#34;, 20, &amp;#34;English&amp;#34;, &amp;#34;Chinese&amp;#34;) Student定义了一个学生的数据结构，有姓名、年龄、课程等属性，mike是其一个实例，从中可以看到，mike全名Mike Hsu，年龄20岁，选修了英文、中文等课程。
+然后我导入Python内置的pickle模块，进行一次序列化操作：
+import pickle pickle.dumps(mike) 控制台会打印一串字节数组，如：
+b&amp;#39;\x80\x03c__main__\nStudent\nq\x00)\x81q\x01}q\x02(X\x04\x00\x00\x00nameq\x03X\x08\x00\x00\x00Mike Hsuq\x04X\x03\x00\x00\x00ageq\x05K\x14X\x07\x00\x00\x00coursesq\x06X\x07\x00\x00\x00Englishq\x07X\x07\x00\x00\x00Chineseq\x08\x86q\tub.&amp;#39; 你可以尝试复制本地的控制台输出内容，然后执行以下代码：
+import pickle m = pickle.loads(b&amp;#39;xxxxx&amp;#39;) # 替换成你复制的内容 print(m.age) print(m.name) print(m.courses) 你会惊奇的发现，m这个对象的值与上面的mike值是一致的，即便这两个对象存在于两次运行之中。
+参照维基百科的解释，结合上面的例子，我们来理解下到底什么是序列化和反序列化
+ 在计算机科学的数据处理中，是指将数据结构或对象状态转换成可取用格式（例如存成文件，存于缓冲，或经由网络中发送），以留待后续在相同或另一台计算机环境中，能恢复原先状态的过程。
+从一系列字节提取数据结构的反向操作，是反序列化
+ JSON是种序列化协议 pickle是Python内置的序列化模块，用于对Python对象的序列化以及反序列化，但是应用并不广泛——序列化协议往往要求具备跨语言、跨平台特性，它仅仅用于python内部对象，而且每个版本的实现均有差别。
+XML、JSON是更流行的序列化协议，因为它们具备了上面提到的两个特性，它们打通了不同语言实现的服务之间的沟通隔阂。
+Python也内置的json的序列化库，使用上非常简单方便：
+import json j = &amp;#39;{&amp;#34;name&amp;#34;: &amp;#34;Mike Hsu&amp;#34;, &amp;#34;age&amp;#34;: 20, &amp;#34;courses&amp;#34;: [&amp;#34;English&amp;#34;, &amp;#34;Chinese&amp;#34;]}&amp;#39; jo = json.</description>
+    </item>
     
     <item>
       <title>Python接口测试实战5 - 面向服务封装</title>
