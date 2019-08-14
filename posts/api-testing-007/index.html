@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Python接口测试实战7 - unittest单元测试框架 // Jace&#39;s Blog</title>
+
+        <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+        <meta property="og:title" content="Python接口测试实战7 - unittest单元测试框架" />
+    <meta property="og:description" content="" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://blog.xuh.me/posts/api-testing-007/" />
+    
+
+    <link href="" rel="alternate" type="application/rss+xml" title="Jace&#39;s Blog" />
+    <link rel="shortcut icon" href="/favicon.png">
+
+    <link href="https://blog.xuh.me/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+    <link href="https://blog.xuh.me/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="https://blog.xuh.me/css/style.css">
+
+    <meta name="generator" content="Hugo 0.55.3" />
+</head>
+
+
+<body>
+<div id="container">
+    <header id="header">
+    <div id="header-outer" class="outer">
+        <div id="header-inner" class="inner">
+            <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+            <a id="logo" class="logo-text" href="https://blog.xuh.me/">Jace&#39;s Blog</a>
+            <nav id="main-nav">
+                
+                <a class="main-nav-link" href="/">Home</a>
+                
+                <a class="main-nav-link" href="/posts">Posts</a>
+                
+                <a class="main-nav-link" href="/tags">Tags</a>
+                
+            </nav>
+            <nav id="sub-nav">
+                <div id="search-form-wrap">
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+
+    <section id="main" class="outer">
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        <header class="article-header">
+            <h1 class="article-title" itemprop="name">Python接口测试实战7 - unittest单元测试框架</h1>
+        </header>
+        
+        <div class="article-meta">
+            <a href="/posts/api-testing-007/" class="article-date">
+                <time datetime='2019-08-14T09:11:07.000&#43;08:00' itemprop="datePublished">2019-08-14</time>
+            </a>
+            
+            
+            
+        </div>
+        <div class="article-entry" itemprop="articleBody">
+            
+
+<p><a href="https://docs.python.org/3/library/unittest.html">unittest</a>是Python内置的单元测试框架，是一个<strong>足够精简也足够完善</strong>的单元测试框架，在其中有以下四种概念：</p>
+
+<ul>
+<li>test fixture</li>
+<li>test case</li>
+<li>test suite</li>
+<li>test runner</li>
+</ul>
+
+<p>我们以一段测试代码样例来展开介绍这四个概念：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> unittest
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TestGetIssue</span>(unittest<span style="color:#f92672">.</span>TestCase):
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">setUp</span>(self):
+        self<span style="color:#f92672">.</span>client <span style="color:#f92672">=</span> RedmineClient(<span style="color:#e6db74">&#34;https://redmine.xuh.me&#34;</span>, <span style="color:#e6db74">&#34;490592ea4e46348df29828edd597acbfdc5ebb4a&#34;</span>)
+    
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test_get_issue</span>(self):
+        resp <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>client<span style="color:#f92672">.</span>get_issue(<span style="color:#e6db74">&#34;1&#34;</span>)
+        self<span style="color:#f92672">.</span>assertEqual(resp[<span style="color:#e6db74">&#34;issue&#34;</span>][<span style="color:#e6db74">&#34;id&#34;</span>], <span style="color:#ae81ff">1</span>)
+    
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test_bad_issue_id</span>(self):
+        resp <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>client<span style="color:#f92672">.</span>get_issue(<span style="color:#e6db74">&#34;-1&#34;</span>)
+        self<span style="color:#f92672">.</span>assertIsNone(resp[<span style="color:#e6db74">&#34;issue&#34;</span>])
+
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
+    unittest<span style="color:#f92672">.</span>main()</code></pre></div>
+<h3 id="test-fixture">Test Fixture</h3>
+
+<p>test fixture中文可以叫做<strong>测试夹具</strong>，如果对它理解困难的话，可以看下其定于：</p>
+
+<blockquote>
+<p>A <em>test fixture</em> represents the preparation needed to perform one or more tests, and any associate cleanup actions. This may involve, for example, creating temporary or proxy databases, directories, or starting a server process.</p>
+</blockquote>
+
+<p>上面代码中的<code>setUp</code>即可以理解为test fixture，它会在用例执行之前先行被调用，往往作用测试数据的准备、测试对象的实例化等。</p>
+
+<p>unittest支持模块级别的test fixture：</p>
+
+<ul>
+<li>setUpModule</li>
+<li>tearDownModule</li>
+</ul>
+
+<p>还支持test suite级别的test fixture:</p>
+
+<ul>
+<li>setUpClass</li>
+<li>tearDownClass</li>
+</ul>
+
+<p>当然还支持用例级别的test fixture:</p>
+
+<ul>
+<li>setUp</li>
+<li>tearDown</li>
+</ul>
+
+<p>这些fixture的执行顺序如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">- setUpModule
+	- setUpClass &lt;suite-1&gt;
+		- setUp
+		- test-1-1
+		- tearDown
+		- setUp
+		- test-1-2
+		- tearDown
+		...
+	- tearDownClass &lt;suite-1&gt;
+	...
+- tearDownModule</code></pre></div>
+<h3 id="test-case">Test Case</h3>
+
+<p>即测试用例，也就是在上文代码样例中的<code>test_get_isssue</code>以及<code>test_bad_issue_id</code>两个function，默认情况下，在一个TestCase下以<code>test</code>开头的函数会视作测试用例：<a href="https://docs.python.org/3/library/unittest.html#unittest.TestLoader.testMethodPrefix">https://docs.python.org/3/library/unittest.html#unittest.TestLoader.testMethodPrefix</a></p>
+
+<p>在test case中，当需要检查实际值是否与期望值一致时，可以使用断言，如：</p>
+
+<ul>
+<li>self.assertEqual</li>
+<li>self.assert</li>
+</ul>
+
+<p>我相信测试人员对测试用例是什么应该是完全能够理解的，所以我这边也就不再赘述，除了一点：<strong>test case的执行顺序与你在TestCase下编写顺序并无关联，另外请勿强约束不同用例的执行顺序</strong></p>
+
+<p>未避免与类<code>TestCase</code>产生混淆，这个概念下文称之为Test Function</p>
+
+<h3 id="test-suite">Test Suite</h3>
+
+<p>一般称之为测试套件，即所有用例的集合，是test runner的运行对象</p>
+
+<h3 id="test-runner">Test Runner</h3>
+
+<p>test runner用于执行test suite以及输出结果，<code>unittest</code>内置了<code>TextTestRunner</code>。</p>
+
+<p>这个组件有可能是<code>unittest</code>最薄弱的一个环节，比如很多人喜欢使用<a href="https://pypi.org/project/html-testRunner/">HtmlTestRunner</a>生成html格式的测试报告</p>
+
+<h3 id="testcase-与-test-function之间的关系">TestCase 与 Test Function之间的关系</h3>
+
+<p>理解完这些基础概念后，我们在看看使用这个框架时一些要注意的问题: <strong>class TestCase</strong> 与<code>def test_xxx</code>之间的关系</p>
+
+<p>往往很多人会这么理解两者：TestRunner会实例化一个TestCase类，然后按某个顺序执行TestCase类下实现的<code>test_xx</code>这类函数，这样来不同的test function就可以使用约定的TestCase实例变量来传递上下文了，实现不同用例之间的关联，那事实是这样吗？</p>
+
+<p>我们只能从源码中寻找答案。（Python 3.7+）</p>
+
+<p>用例加载器是如何找到test function的：<code>unittest/loader.py</code></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">getTestCaseNames</span>(self, testCaseClass):
+        <span style="color:#e6db74">&#34;&#34;&#34;Return a sorted sequence of method names found within testCaseClass
+</span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+        <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">shouldIncludeMethod</span>(attrname):
+            <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> attrname<span style="color:#f92672">.</span>startswith(self<span style="color:#f92672">.</span>testMethodPrefix):
+                <span style="color:#66d9ef">return</span> False
+            testFunc <span style="color:#f92672">=</span> getattr(testCaseClass, attrname)
+            <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> callable(testFunc):
+                <span style="color:#66d9ef">return</span> False
+            fullName <span style="color:#f92672">=</span> f<span style="color:#e6db74">&#39;</span><span style="color:#e6db74">%s</span><span style="color:#e6db74">.</span><span style="color:#e6db74">%s</span><span style="color:#e6db74">.</span><span style="color:#e6db74">%s</span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">%</span> (
+                testCaseClass<span style="color:#f92672">.</span>__module__, testCaseClass<span style="color:#f92672">.</span>__qualname__, attrname
+            )
+            <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>testNamePatterns <span style="color:#f92672">is</span> None <span style="color:#f92672">or</span> \
+                any(fnmatchcase(fullName, pattern) <span style="color:#66d9ef">for</span> pattern <span style="color:#f92672">in</span> self<span style="color:#f92672">.</span>testNamePatterns)
+        testFnNames <span style="color:#f92672">=</span> list(filter(shouldIncludeMethod, dir(testCaseClass)))
+        <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>sortTestMethodsUsing:
+            testFnNames<span style="color:#f92672">.</span>sort(key<span style="color:#f92672">=</span>functools<span style="color:#f92672">.</span>cmp_to_key(self<span style="color:#f92672">.</span>sortTestMethodsUsing))
+        <span style="color:#66d9ef">return</span> testFnNames
+ 
+
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">loadTestsFromTestCase</span>(self, testCaseClass):
+        <span style="color:#e6db74">&#34;&#34;&#34;Return a suite of all test cases contained in testCaseClass&#34;&#34;&#34;</span>
+        <span style="color:#66d9ef">if</span> issubclass(testCaseClass, suite<span style="color:#f92672">.</span>TestSuite):
+            <span style="color:#66d9ef">raise</span> <span style="color:#a6e22e">TypeError</span>(<span style="color:#e6db74">&#34;Test cases should not be derived from &#34;</span>
+                            <span style="color:#e6db74">&#34;TestSuite. Maybe you meant to derive from &#34;</span>
+                            <span style="color:#e6db74">&#34;TestCase?&#34;</span>)
+        testCaseNames <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>getTestCaseNames(testCaseClass)
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> testCaseNames <span style="color:#f92672">and</span> hasattr(testCaseClass, <span style="color:#e6db74">&#39;runTest&#39;</span>):
+            testCaseNames <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;runTest&#39;</span>]
+        loaded_suite <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>suiteClass(map(testCaseClass, testCaseNames))
+        <span style="color:#66d9ef">return</span> loaded_suite</code></pre></div>
+<p>再看<code>unittest/suite.py</code></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">BaseTestSuite</span>(object):
+    <span style="color:#e6db74">&#34;&#34;&#34;A simple test suite that doesn&#39;t provide class or module shared fixtures.
+</span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+    _cleanup <span style="color:#f92672">=</span> True
+
+    <span style="color:#66d9ef">def</span> __init__(self, tests<span style="color:#f92672">=</span>()):
+        self<span style="color:#f92672">.</span>_tests <span style="color:#f92672">=</span> []
+        self<span style="color:#f92672">.</span>_removed_tests <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+        self<span style="color:#f92672">.</span>addTests(tests)
+
+    <span style="color:#66d9ef">def</span> __iter__(self):
+        <span style="color:#66d9ef">return</span> iter(self<span style="color:#f92672">.</span>_tests)
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TestSuite</span>(BaseTestSuite):
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">run</span>(self, result, debug<span style="color:#f92672">=</span>False):
+        topLevel <span style="color:#f92672">=</span> False
+        <span style="color:#66d9ef">if</span> getattr(result, <span style="color:#e6db74">&#39;_testRunEntered&#39;</span>, False) <span style="color:#f92672">is</span> False:
+            result<span style="color:#f92672">.</span>_testRunEntered <span style="color:#f92672">=</span> topLevel <span style="color:#f92672">=</span> True
+
+        <span style="color:#66d9ef">for</span> index, test <span style="color:#f92672">in</span> enumerate(self):
+            <span style="color:#75715e"># 省略过程代码</span>
+            <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> debug:
+                test(result)
+            <span style="color:#66d9ef">else</span>:
+                test<span style="color:#f92672">.</span>debug()</code></pre></div>
+<p>最后看下 <code>unittest/case.py</code></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TestCase</span>(object):
+    <span style="color:#66d9ef">def</span> __init__(self, methodName<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;runTest&#39;</span>):
+        <span style="color:#e6db74">&#34;&#34;&#34;Create an instance of the class that will use the named test
+</span><span style="color:#e6db74">           method when executed. Raises a ValueError if the instance does
+</span><span style="color:#e6db74">           not have a method with the specified name.
+</span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+        self<span style="color:#f92672">.</span>_testMethodName <span style="color:#f92672">=</span> methodName
+
+    <span style="color:#66d9ef">def</span> __call__(self, <span style="color:#f92672">*</span>args, <span style="color:#f92672">**</span>kwds):
+        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>run(<span style="color:#f92672">*</span>args, <span style="color:#f92672">**</span>kwds)
+
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">run</span>(self, result<span style="color:#f92672">=</span>None):
+
+        testMethod <span style="color:#f92672">=</span> getattr(self, self<span style="color:#f92672">.</span>_testMethodName)
+
+            <span style="color:#66d9ef">with</span> outcome<span style="color:#f92672">.</span>testPartExecutor(self):
+                self<span style="color:#f92672">.</span>setUp()
+            <span style="color:#66d9ef">if</span> outcome<span style="color:#f92672">.</span>success:
+                outcome<span style="color:#f92672">.</span>expecting_failure <span style="color:#f92672">=</span> expecting_failure
+                <span style="color:#66d9ef">with</span> outcome<span style="color:#f92672">.</span>testPartExecutor(self, isTest<span style="color:#f92672">=</span>True):
+                    testMethod()
+                outcome<span style="color:#f92672">.</span>expecting_failure <span style="color:#f92672">=</span> False
+                <span style="color:#66d9ef">with</span> outcome<span style="color:#f92672">.</span>testPartExecutor(self):
+                    self<span style="color:#f92672">.</span>tearDown()
+
+            self<span style="color:#f92672">.</span>doCleanups()</code></pre></div>
+<p>通过走读源码，test function的加载到执行逻辑其实就很清楚了：</p>
+
+<ol>
+<li>TestLoader查询不同TestCase下的以test开头的function，视作test function，添加到TestSuite中</li>
+<li><code>TestSuite</code>运行时，会遍历这些这些<code>tests</code>，并以<code>TestCase(&quot;test_xxx&quot;)</code>的方式实例化这些TestCase类</li>
+<li>执行<code>TestCase.run</code>函数，找到<code>test_xxx</code>函数，并执行</li>
+</ol>
+
+<p>所以回答上面提出的问题：<strong>虽然不同的Test Function定义在一个TestCase内，但是运行时会实例化出不同的TestCase，因此这些Test Function之间不可能通过实例变量传递上下文</strong></p>
+
+<p>其实这样来，也对我们的用例设计提出了一个要求：<strong>每个用例(Test Function)必须闭合、与其他用例解耦</strong></p>
+
+<h2 id="第三方测试框架">第三方测试框架</h2>
+
+<p>除了Python内置的<code>unittest</code>框架外，目前还有很多第三方测试框架，如</p>
+
+<ul>
+<li>nose</li>
+<li>nose2</li>
+<li>pytest</li>
+</ul>
+
+<p>这些框架都兼容<code>unittest</code>框架的特性，因此我建议是：尽量使用unittest组织测试用例，可以在执行层面引入三方框架，增强能力，比如</p>
+
+<ul>
+<li>输出html测试报告</li>
+<li>并行执行</li>
+<li>更好的test fixutre</li>
+</ul>
+
+<p>正因为我一直秉持这样的原则，所以我们项目从unittest -&gt; nose -&gt; pytest转换时很顺畅，没有遇到过太多的问题。</p>
+
+<p>而如果一上来直接使用nose或者pytest，并且深度使用其特性，比如<code>pytest.fixture</code>，那如果需要切换到其他框架时，将会遇到非常大的改造成本。</p>
+
+<p>另外我还需要重申下：<strong>unittest提供的test fixture足够精简、好用，如果觉得不够用，请先提高你的Python编程能力</strong></p>
+
+        </div>
+
+        
+        
+        <div class="article-toc" style="display:none;">
+            <h3>Contents</h3>
+            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#test-fixture">Test Fixture</a></li>
+<li><a href="#test-case">Test Case</a></li>
+<li><a href="#test-suite">Test Suite</a></li>
+<li><a href="#test-runner">Test Runner</a></li>
+<li><a href="#testcase-与-test-function之间的关系">TestCase 与 Test Function之间的关系</a></li>
+</ul></li>
+<li><a href="#第三方测试框架">第三方测试框架</a></li>
+</ul></li>
+</ul>
+</nav>
+        </div>
+        
+        
+
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.slim.min.js" integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc=" crossorigin="anonymous"></script>
+        <script>
+            (function() {
+                var $toc = $('#TableOfContents');
+                if ($toc.length > 0) {
+                    var $window = $(window);
+
+                    function onScroll(){
+                        var currentScroll = $window.scrollTop();
+                        var h = $('.article-entry h1, .article-entry h2, .article-entry h3, .article-entry h4, .article-entry h5, .article-entry h6');
+                        var id = "";
+                        h.each(function (i, e) {
+                            e = $(e);
+                            if (e.offset().top - 10 <= currentScroll) {
+                                id = e.attr('id');
+                            }
+                        });
+                        var active = $toc.find('a.active');
+                        if (active.length == 1 && active.eq(0).attr('href') == '#' + id) return true;
+
+                        active.each(function (i, e) {
+                            $(e).removeClass('active').siblings('ul').hide();
+                        });
+                        $toc.find('a[href="#' + id + '"]').parentsUntil('#TableOfContents').each(function (i, e) {
+                            $(e).children('a').addClass('active').siblings('ul').show();
+                        });
+                    }
+
+                    $window.on('scroll', onScroll);
+                    $(document).ready(function() {
+                        $toc.find('a').parent('li').find('ul').hide();
+                        onScroll();
+                        document.getElementsByClassName('article-toc')[0].style.display = '';
+                    });
+                }
+            })();
+        </script>
+        
+
+        
+        <footer class="article-footer">
+            <ul class="article-tag-list">
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://blog.xuh.me//tags/python">Python
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://blog.xuh.me//tags/%E6%8E%A5%E5%8F%A3%E6%B5%8B%E8%AF%95">接口测试
+                    </a>
+                </li>
+                
+            </ul>
+        </footer>
+        
+        <nav id="article-nav">
+    
+    
+    <a href="/posts/api-testing-006/" id="article-nav-older" class="article-nav-link-wrap">
+        <div class="article-nav-title">Python接口测试实战6 - 序列化与反序列化&nbsp;<span>&gt;</span></div>
+    </a>
+    
+</nav>
+
+
+        
+        <script src="https://utteranc.es/client.js"
+            repo="jacexh/comments"
+            issue-term="pathname"
+            label="blog"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+        </script>
+        
+    </div>
+</article>
+
+        
+    </section>
+    <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2019 jacexh
+            <br />
+            Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> with theme <a href="https://github.com/carsonip/hugo-theme-minos" target="_blank">Minos</a>
+        </div>
+    </div>
+    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark.min.css" integrity="sha256-GA29iW/iYj9FcuQQktvW45pRzHvZeFfgeFvA4tGVjpM=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js" integrity="sha256-aYTdUrn6Ow1DDgh5JTc3aDGnnju48y/1c8s1dgkYPQ8=" crossorigin="anonymous"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    
+    <script>
+        document.getElementById('main-nav-toggle').addEventListener('click', function () {
+            var header = document.getElementById('header');
+            if (header.classList.contains('mobile-on')) {
+                header.classList.remove('mobile-on');
+            } else {
+                header.classList.add('mobile-on');
+            }
+        });
+    </script>
+</footer>
+
+</div>
+</body>
+</html>
