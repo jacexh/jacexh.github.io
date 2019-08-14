@@ -72,10 +72,16 @@
                 <div class="article-entry" itemprop="articleBody">
                     <p>
                         
-                    unittest是Python内置的单元测试框架，是一个足够精简也足够完善的单元测试框架，在其中有以下四种概念：
- test fixture test case test suite test runner  我们以一段测试代码样例来展开介绍这四个概念：
-import unittest class TestGetIssue(unittest.TestCase): def setUp(self): self.client = RedmineClient(&#34;https://redmine.xuh.me&#34;, &#34;490592ea4e46348df29828edd597acbfdc5ebb4a&#34;) def test_get_issue(self): resp = self.client.get_issue(&#34;1&#34;) self.assertEqual(resp[&#34;issue&#34;][&#34;id&#34;], 1) def test_bad_issue_id(self): resp = self.client.get_issue(&#34;-1&#34;) self.assertIsNone(resp[&#34;issue&#34;]) if __name__ == &#34;__main__&#34;: unittest.main() Test Fixture test fixture中文可以叫做测试夹具，如果对它理解困难的话，可以看下其定于：
- A test fixture represents the preparation needed to perform one or more tests, and any associate cleanup actions. This may involve, for example, creating temporary or proxy databases, directories, or starting a server process.
+                    <p><a href="https://docs.python.org/3/library/unittest.html">unittest</a>是Python内置的单元测试框架，是一个<strong>足够精简也足够完善</strong>的单元测试框架，在其中有以下四种概念：</p>
+
+<ul>
+<li>test fixture</li>
+<li>test case</li>
+<li>test suite</li>
+<li>test runner</li>
+</ul>
+
+<p>我们以一段测试代码样例来展开介绍这四个概念：</p>
                     </p>
                     <p class="article-more-link">
                         <a href="/posts/api-testing-007/">Read More</a>
