@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>P2P平台暴雷后，该怎么确认自己的待回款资金？ // Jace&#39;s Blog</title>
+
+        <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+        <meta property="og:title" content="P2P平台暴雷后，该怎么确认自己的待回款资金？" />
+    <meta property="og:description" content="" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://blog.xuh.me/posts/invoke-api-from-mitm-attack/" />
+    
+
+    <link href="" rel="alternate" type="application/rss+xml" title="Jace&#39;s Blog" />
+    <link rel="shortcut icon" href="/favicon.png">
+
+    <link href="https://blog.xuh.me/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+    <link href="https://blog.xuh.me/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="https://blog.xuh.me/css/style.css">
+
+    <meta name="generator" content="Hugo 0.55.3" />
+</head>
+
+
+<body>
+<div id="container">
+    <header id="header">
+    <div id="header-outer" class="outer">
+        <div id="header-inner" class="inner">
+            <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+            <a id="logo" class="logo-text" href="https://blog.xuh.me/">Jace&#39;s Blog</a>
+            <nav id="main-nav">
+                
+                <a class="main-nav-link" href="/">Home</a>
+                
+                <a class="main-nav-link" href="/posts">Posts</a>
+                
+                <a class="main-nav-link" href="/tags">Tags</a>
+                
+            </nav>
+            <nav id="sub-nav">
+                <div id="search-form-wrap">
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+
+    <section id="main" class="outer">
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        <header class="article-header">
+            <h1 class="article-title" itemprop="name">P2P平台暴雷后，该怎么确认自己的待回款资金？</h1>
+        </header>
+        
+        <div class="article-meta">
+            <a href="/posts/invoke-api-from-mitm-attack/" class="article-date">
+                <time datetime='2020-02-28T22:42:22.000&#43;08:00' itemprop="datePublished">2020-02-28</time>
+            </a>
+            
+            
+            
+        </div>
+        <div class="article-entry" itemprop="articleBody">
+            
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200228132821.png" alt="" /></p>
+
+<blockquote>
+<p>本文不探讨P2P行业现状，只是借此介绍下接口渗透以及中间人攻击原理</p>
+</blockquote>
+
+<p>前几年我试着把一些资金投到P2P产品里，想要赚取比余额宝多一些的利润，当时选择的某个大平台下的一个P2P子品牌。到了去年这个时候，监管政策不断收紧，隐隐约约觉得原先的平台不稳妥，但同时又觉得P2P产品的合理性是有的，监管层面应该会给头部的大平台留一些生存空间。自以为是的把资金切换到了头部的并且都已上市的平台上，好在我还懂<strong>不能把鸡蛋都放一个篮子里</strong>的道理：没把所有的钱都投到P2P，还把投入到P2P的钱分散到了两个平台上。</p>
+
+<p><strong>不过平台暴雷这个事情还是被我赶上了↓↓↓</strong></p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200228141638.png" alt="" /></p>
+
+<p>我惊愕平台单方面擅自修改了用户协议，但愤怒归愤怒，我需要快速理解现在的还款逻辑，方便我收集证据、维权：</p>
+
+<p>比如你在去年3月1日投标给这个网贷平台，期限一年，本金1万。按理能在今年的2月29日收到本金一万，以及利息若干。P2P平台实际运作时，为了分摊风险，不会把你的钱只贷款给一个人，它会把你的钱打散，分到多个散标之中，放款给借款人。</p>
+
+<p>该平台修改协议后，只有当你投的散标回款后你才可能收到回款，而且这些散标不是一年前的，有可能是半年前的，有可能最近才发，而且整个回款周期最长要三年。</p>
+
+<p><strong>惨，我为了图那点利息，资金被平台占用四年之久，而且连一年的利息都不给你了，只还本金。</strong></p>
+
+<p>打开APP看到的惨状：</p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200228145215.png" alt="" /></p>
+
+<p>不考虑之后跟平台怎么撕逼维权这些事，面对这么多散标，并且已经无法再相信平台的情况，有几个问题亟待解决：</p>
+
+<ul>
+<li>如何确认被拆成这么多散标后，我的资金总额是完整的？</li>
+<li>每天都可能有散标回款，少则一分，多则几十、几百，如何进行对账？</li>
+</ul>
+
+<h3 id="接口嗅探">接口嗅探</h3>
+
+<p>我的想法是从接口层面拿结构化的数据出来，累加之后判断散标总额是否正确，之后每次回款都进行对账，不能遗漏一笔标的。</p>
+
+<p>上面的方法是建立于该平台APP未进行双向证书验证（大部分APP都没有该防护），并且接口设计上未做严格的数字签名，能够被外部用户手动构造合法请求的基础之上。动手试试看吧。</p>
+
+<p>我这边使用的<code>mitmproxy</code>，也可以使用<code>charles</code>，完成iOS的网络配置后，我试着打开APP做一些操作。</p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200228152959.png" alt="mitmweb" /></p>
+
+<p>接口请求在mitmweb上齐刷刷的出现的，果然，这类APP并没有双向证书校验，通讯报文一目了然，我也很快定位到我需要的一个接口上：<code>/api/v2/v3/user/repay/list/BIDDING</code></p>
+
+<h3 id="接口分析">接口分析</h3>
+
+<p>先分析下这个接口的query params，比较简单：</p>
+
+<ul>
+<li><code>holdStatus</code>: 散标持有状态吧，0应该表示为回款的</li>
+<li><code>page</code>&amp;<code>size</code>: 分页参数，page从1开始递增</li>
+</ul>
+
+<p>再来看下请求头参数，这里就有一大堆了：</p>
+
+<ul>
+<li><code>Device-Mac</code>: 猜测是手机硬件信息，但是应该可以随便传</li>
+<li><code>Cookie</code>：这个没什么可说的，原样复制就行</li>
+<li><code>vendorId</code>: 估计是表示手机类型，苹果或者安卓</li>
+<li><code>ScreenRes</code>: 不清楚</li>
+<li><code>Channel</code>: 不清楚，但不重要</li>
+<li><code>Keys-Identity</code>：看着很重要的一个值，但是固定不变，抄就行了</li>
+<li><code>Authorization</code>: 最担心的一个参数，不过居然也是固定不变，障碍扫清了</li>
+<li><code>safeimei</code>、<code>idfa</code>: 不清楚什么含义，但是值是一致的，也是固定不变的，抄</li>
+</ul>
+
+<p>再来看下响应报文，看看怎么提取我要的数据：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+    <span style="color:#f92672">&#34;d&#34;</span>: {
+        <span style="color:#f92672">&#34;repayments&#34;</span>: [
+            {
+                <span style="color:#f92672">&#34;dateDesc&#34;</span>: <span style="color:#e6db74">&#34;2020年02月29日&#34;</span>,
+                <span style="color:#f92672">&#34;items&#34;</span>: [
+                    {
+                        <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#e6db74">&#34;0.01&#34;</span>,
+                        <span style="color:#960050;background-color:#1e0010">...</span>
+                    },
+                    {
+                        <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#e6db74">&#34;0.01&#34;</span>,
+                        <span style="color:#960050;background-color:#1e0010">...</span>
+                    }
+            <span style="color:#960050;background-color:#1e0010">}</span>,
+            {
+                <span style="color:#f92672">&#34;dateDesc&#34;</span>: <span style="color:#e6db74">&#34;2020年03月01日&#34;</span>,
+                <span style="color:#f92672">&#34;items&#34;</span>: [
+                    {
+                        <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#e6db74">&#34;0.01&#34;</span>,
+                       <span style="color:#960050;background-color:#1e0010">...</span>
+                    }
+                ],
+            }
+        ],
+        <span style="color:#f92672">&#34;xplanContinuedGoodsNo&#34;</span>: <span style="color:#e6db74">&#34;&#34;</span>,
+        <span style="color:#f92672">&#34;xplanContinuedRate&#34;</span>: <span style="color:#e6db74">&#34;0&#34;</span>
+    },
+    <span style="color:#e6db74">&#34;m&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> <span style="color:#e6db74">&#34;&#34;</span>,
+    <span style="color:#e6db74">&#34;r&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> <span style="color:#ae81ff">1</span>
+<span style="color:#960050;background-color:#1e0010">}</span></code></pre></div>
+<ul>
+<li>回款数据都在<code>d.repayments</code>节点下</li>
+<li>回款记录按天来切割，并存放于<code>..items</code>节点下，是个数组</li>
+<li><code>amount</code>即为回款金额，是字符串类型</li>
+</ul>
+
+<p>于是我快速写了个Python脚本来统计我的资金：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> requests
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">WDWClient</span>:
+    headers <span style="color:#f92672">=</span> {
+        <span style="color:#e6db74">&#34;Device-Mac&#34;</span>: <span style="color:#e6db74">&#34;xxx&#34;</span>,
+        <span style="color:#e6db74">&#34;Referer&#34;</span>: <span style="color:#e6db74">&#34;https://mobilegt.weidai.com.cn/api&#34;</span>,
+        <span style="color:#e6db74">&#34;Cookie&#34;</span>: <span style="color:#e6db74">&#34;xxx&#34;</span>,
+        <span style="color:#e6db74">&#34;User-Agent&#34;</span>: <span style="color:#e6db74">&#34;xxx&#34;</span>,
+        <span style="color:#e6db74">&#34;vendorId&#34;</span>: <span style="color:#e6db74">&#34;apple&#34;</span>,
+        <span style="color:#e6db74">&#34;ScreenRes&#34;</span>: <span style="color:#e6db74">&#34;2&#34;</span>,
+        <span style="color:#e6db74">&#34;Channel&#34;</span>: <span style="color:#e6db74">&#34;AppStore&#34;</span>,
+        <span style="color:#e6db74">&#34;Keys-Identity&#34;</span>: <span style="color:#e6db74">&#34;xxx&#34;</span>,
+        <span style="color:#e6db74">&#34;Device-ID&#34;</span>: <span style="color:#e6db74">&#34;xxx&#34;</span>,
+        <span style="color:#e6db74">&#34;Device-Version&#34;</span>: <span style="color:#e6db74">&#34;xxx&#34;</span>,
+        <span style="color:#e6db74">&#34;Authorization&#34;</span>: <span style="color:#e6db74">&#34;xxx&#34;</span>,
+        <span style="color:#e6db74">&#34;safeimei&#34;</span>: <span style="color:#e6db74">&#34;xxx&#34;</span>,
+        <span style="color:#e6db74">&#34;idfa&#34;</span>: <span style="color:#e6db74">&#34;xxx&#34;</span>,
+        <span style="color:#e6db74">&#34;Device&#34;</span>: <span style="color:#e6db74">&#34;1&#34;</span>,
+        <span style="color:#e6db74">&#34;Trace-ID&#34;</span>: <span style="color:#e6db74">&#34;xxx&#34;</span>,
+    }
+
+    <span style="color:#66d9ef">def</span> __init__(self):
+        self<span style="color:#f92672">.</span>client <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>Session()
+        self<span style="color:#f92672">.</span>client<span style="color:#f92672">.</span>headers<span style="color:#f92672">.</span>update(self<span style="color:#f92672">.</span>headers)
+        self<span style="color:#f92672">.</span>base_url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://mobilegt.weidai.com.cn&#34;</span>
+
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_bidding</span>(self, hold_status<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, page<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, size<span style="color:#f92672">=</span><span style="color:#ae81ff">20</span>):
+        <span style="color:#e6db74">&#34;&#34;&#34;获取散标&#34;&#34;&#34;</span>
+        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>client<span style="color:#f92672">.</span>get(self<span style="color:#f92672">.</span>base_url <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/api/v2/v3/user/repay/list/BIDDING&#34;</span>,
+                              params<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#34;holdStatus&#34;</span>: hold_status, <span style="color:#e6db74">&#34;page&#34;</span>: page, <span style="color:#e6db74">&#34;size&#34;</span>: size})<span style="color:#f92672">.</span>json()
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_repayments</span>(res: dict) <span style="color:#f92672">-&gt;</span> list:
+    items <span style="color:#f92672">=</span> []
+    repayments <span style="color:#f92672">=</span> res<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;d&#34;</span>, {})<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;repayments&#34;</span>, [])
+    <span style="color:#66d9ef">for</span> day <span style="color:#f92672">in</span> repayments:
+        <span style="color:#66d9ef">if</span> day<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;items&#34;</span>, None):
+            items<span style="color:#f92672">.</span>extend(day[<span style="color:#e6db74">&#39;items&#39;</span>])
+    <span style="color:#66d9ef">return</span> items
+
+
+
+wdw <span style="color:#f92672">=</span> WDWClient()
+amount <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+count <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+page <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+size <span style="color:#f92672">=</span> <span style="color:#ae81ff">20</span>
+
+<span style="color:#66d9ef">while</span> <span style="color:#ae81ff">1</span>:
+    res <span style="color:#f92672">=</span> wdw<span style="color:#f92672">.</span>get_bidding(hold_status<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, page<span style="color:#f92672">=</span>page, size<span style="color:#f92672">=</span>size)
+    items <span style="color:#f92672">=</span> get_repayments(res)
+    amount <span style="color:#f92672">+=</span> sum([float(item[<span style="color:#e6db74">&#34;amount&#34;</span>]) <span style="color:#66d9ef">for</span> item <span style="color:#f92672">in</span> items])
+    c <span style="color:#f92672">=</span> len(items)
+    count <span style="color:#f92672">+=</span> c
+    <span style="color:#66d9ef">if</span> c <span style="color:#f92672">&lt;</span> size:
+        <span style="color:#66d9ef">break</span>
+    page <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+
+<span style="color:#66d9ef">print</span>(count)
+<span style="color:#66d9ef">print</span>(amount)</code></pre></div>
+<p>到这里我就能统计出散标的资金总额了，暂时是没有差错，之后会再利用它的接口来实现对账能力，这是后话了。</p>
+
+<p>整个接口渗透的过程非常简单，这其实也暴露出该平台技术人员在安全这块掉以轻心了：</p>
+
+<ul>
+<li>没有双向认证的https并不会提升什么安全性</li>
+<li>没有数字签名，用户侧很容易构造接口请求，又天然的绕开了前端校验</li>
+<li>没有控制接口调用频次</li>
+</ul>
+
+<p>而对于“我”这个角色，<strong>不要去尝试越权、资金修改调用等，即便它有可能做好了完备的校验：狗咬你一口，你不需要咬回去</strong></p>
+
+<h3 id="中间人攻击">中间人攻击</h3>
+
+<p>到这里，我还是想尝试讲下中间人攻击的原理。</p>
+
+<p>首先看一张https过程的图：</p>
+
+<p><img src="https://user-gold-cdn.xitu.io/2018/1/5/160c5b10d3f27e00?imageslim" alt="https" /></p>
+
+<p>我把关键点罗列下：</p>
+
+<ol>
+<li>服务端的证书分成公钥、私钥两部分，顾名思义，公钥是可以公开的，私钥不准别人看的</li>
+<li>client接入时，服务端会把公钥下发给client</li>
+<li><strong>client会验证公钥的有效性</strong>，注意：只是验证，如果无效、非法呢？接受还是拒绝？这时由client来决定的，没有强制要求</li>
+</ol>
+
+<p>中间人攻击形成的原理就是上面第三点，看下图：</p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200228163459.png" alt="" /></p>
+
+<p>在原有的请求链路加入一个中间人（Proxy），此时的通讯过程就会变成这样：</p>
+
+<ul>
+<li>User向MITM建立请求，然后MITM向Service建立请求</li>
+<li>Service的公钥不再直接给到User，而是MITM，MITM此时把Service公钥替换成自己证书的公钥，并把自己的公钥下发给User</li>
+<li>User以为跟Service协商出了一个对称性密钥，实际却是跟MITM协商的，此时User跟MIMT通讯完成透明化</li>
+<li>MITM也跟Service协商了对称性密钥，完成了通讯的透明化</li>
+<li>User跟Serivce之间的通讯完全被劫持，MITM可以做任何事</li>
+</ul>
+
+<p>要防范中间人攻击有几种做法：</p>
+
+<ol>
+<li>双向认证</li>
+<li>拒绝无效、非权威结构颁发的证书</li>
+</ol>
+
+<p>对于第二点，思维严谨的同学可能会提出假设：如果MITM用的证书是可信的呢？如果能想到这一点，接受我由衷地称赞吧！👍👍👍</p>
+
+<p>贴一张图，不多展开了</p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200228163046.png" alt="" /></p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200310102547.png" alt="" /></p>
+
+        </div>
+
+        
+        
+        <div class="article-toc" style="display:none;">
+            <h3>Contents</h3>
+            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#接口嗅探">接口嗅探</a></li>
+<li><a href="#接口分析">接口分析</a></li>
+<li><a href="#中间人攻击">中间人攻击</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+        </div>
+        
+        
+
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.slim.min.js" integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc=" crossorigin="anonymous"></script>
+        <script>
+            (function() {
+                var $toc = $('#TableOfContents');
+                if ($toc.length > 0) {
+                    var $window = $(window);
+
+                    function onScroll(){
+                        var currentScroll = $window.scrollTop();
+                        var h = $('.article-entry h1, .article-entry h2, .article-entry h3, .article-entry h4, .article-entry h5, .article-entry h6');
+                        var id = "";
+                        h.each(function (i, e) {
+                            e = $(e);
+                            if (e.offset().top - 10 <= currentScroll) {
+                                id = e.attr('id');
+                            }
+                        });
+                        var active = $toc.find('a.active');
+                        if (active.length == 1 && active.eq(0).attr('href') == '#' + id) return true;
+
+                        active.each(function (i, e) {
+                            $(e).removeClass('active').siblings('ul').hide();
+                        });
+                        $toc.find('a[href="#' + id + '"]').parentsUntil('#TableOfContents').each(function (i, e) {
+                            $(e).children('a').addClass('active').siblings('ul').show();
+                        });
+                    }
+
+                    $window.on('scroll', onScroll);
+                    $(document).ready(function() {
+                        $toc.find('a').parent('li').find('ul').hide();
+                        onScroll();
+                        document.getElementsByClassName('article-toc')[0].style.display = '';
+                    });
+                }
+            })();
+        </script>
+        
+
+        
+        <footer class="article-footer">
+            <ul class="article-tag-list">
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://blog.xuh.me//tags/%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95">安全测试
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://blog.xuh.me//tags/%E4%B8%AD%E9%97%B4%E4%BA%BA%E6%94%BB%E5%87%BB">中间人攻击
+                    </a>
+                </li>
+                
+            </ul>
+        </footer>
+        
+        <nav id="article-nav">
+    
+    <a href="/posts/concurrency-models-of-loucst-jmeter-ab/" id="article-nav-newer" class="article-nav-link-wrap">
+        <div class="article-nav-title"><span>&lt;</span>&nbsp;
+            聊聊ab、wrk、JMeter、Locust这些压测工具的并发模型差别
+        </div>
+    </a>
+    
+    
+    <a href="/posts/api-testing-007/" id="article-nav-older" class="article-nav-link-wrap">
+        <div class="article-nav-title">Python接口测试实战7 - unittest单元测试框架&nbsp;<span>&gt;</span></div>
+    </a>
+    
+</nav>
+
+
+        
+        <script src="https://utteranc.es/client.js"
+            repo="jacexh/comments"
+            issue-term="pathname"
+            label="blog"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+        </script>
+        
+    </div>
+</article>
+
+        
+    </section>
+    <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2020 jacexh
+            <br />
+            Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> with theme <a href="https://github.com/carsonip/hugo-theme-minos" target="_blank">Minos</a>
+        </div>
+    </div>
+    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark.min.css" integrity="sha256-GA29iW/iYj9FcuQQktvW45pRzHvZeFfgeFvA4tGVjpM=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js" integrity="sha256-aYTdUrn6Ow1DDgh5JTc3aDGnnju48y/1c8s1dgkYPQ8=" crossorigin="anonymous"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    
+    <script>
+        document.getElementById('main-nav-toggle').addEventListener('click', function () {
+            var header = document.getElementById('header');
+            if (header.classList.contains('mobile-on')) {
+                header.classList.remove('mobile-on');
+            } else {
+                header.classList.add('mobile-on');
+            }
+        });
+    </script>
+</footer>
+
+</div>
+</body>
+</html>

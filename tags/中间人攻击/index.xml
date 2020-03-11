@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>中间人攻击 on Jace&#39;s Blog</title>
+    <link>https://blog.xuh.me/tags/%E4%B8%AD%E9%97%B4%E4%BA%BA%E6%94%BB%E5%87%BB/</link>
+    <description>Recent content in 中间人攻击 on Jace&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <managingEditor>jace.xh@gmail.com (jacexh)</managingEditor>
+    <webMaster>jace.xh@gmail.com (jacexh)</webMaster>
+    <copyright>xuh.me — All rights reserved.</copyright>
+    <lastBuildDate>Fri, 28 Feb 2020 22:42:22 +0800</lastBuildDate>
+    
+	<atom:link href="https://blog.xuh.me/tags/%E4%B8%AD%E9%97%B4%E4%BA%BA%E6%94%BB%E5%87%BB/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>P2P平台暴雷后，该怎么确认自己的待回款资金？</title>
+      <link>https://blog.xuh.me/posts/invoke-api-from-mitm-attack/</link>
+      <pubDate>Fri, 28 Feb 2020 22:42:22 +0800</pubDate>
+      <author>jace.xh@gmail.com (jacexh)</author>
+      <guid>https://blog.xuh.me/posts/invoke-api-from-mitm-attack/</guid>
+      <description>本文不探讨P2P行业现状，只是借此介绍下接口渗透以及中间人攻击原理
+ 前几年我试着把一些资金投到P2P产品里，想要赚取比余额宝多一些的利润，当时选择的某个大平台下的一个P2P子品牌。到了去年这个时候，监管政策不断收紧，隐隐约约觉得原先的平台不稳妥，但同时又觉得P2P产品的合理性是有的，监管层面应该会给头部的大平台留一些生存空间。自以为是的把资金切换到了头部的并且都已上市的平台上，好在我还懂不能把鸡蛋都放一个篮子里的道理：没把所有的钱都投到P2P，还把投入到P2P的钱分散到了两个平台上。
+不过平台暴雷这个事情还是被我赶上了↓↓↓
+我惊愕平台单方面擅自修改了用户协议，但愤怒归愤怒，我需要快速理解现在的还款逻辑，方便我收集证据、维权：
+比如你在去年3月1日投标给这个网贷平台，期限一年，本金1万。按理能在今年的2月29日收到本金一万，以及利息若干。P2P平台实际运作时，为了分摊风险，不会把你的钱只贷款给一个人，它会把你的钱打散，分到多个散标之中，放款给借款人。
+该平台修改协议后，只有当你投的散标回款后你才可能收到回款，而且这些散标不是一年前的，有可能是半年前的，有可能最近才发，而且整个回款周期最长要三年。
+惨，我为了图那点利息，资金被平台占用四年之久，而且连一年的利息都不给你了，只还本金。
+打开APP看到的惨状：
+不考虑之后跟平台怎么撕逼维权这些事，面对这么多散标，并且已经无法再相信平台的情况，有几个问题亟待解决：
+ 如何确认被拆成这么多散标后，我的资金总额是完整的？ 每天都可能有散标回款，少则一分，多则几十、几百，如何进行对账？  接口嗅探 我的想法是从接口层面拿结构化的数据出来，累加之后判断散标总额是否正确，之后每次回款都进行对账，不能遗漏一笔标的。
+上面的方法是建立于该平台APP未进行双向证书验证（大部分APP都没有该防护），并且接口设计上未做严格的数字签名，能够被外部用户手动构造合法请求的基础之上。动手试试看吧。
+我这边使用的mitmproxy，也可以使用charles，完成iOS的网络配置后，我试着打开APP做一些操作。
+接口请求在mitmweb上齐刷刷的出现的，果然，这类APP并没有双向证书校验，通讯报文一目了然，我也很快定位到我需要的一个接口上：/api/v2/v3/user/repay/list/BIDDING
+接口分析 先分析下这个接口的query params，比较简单：
+ holdStatus: 散标持有状态吧，0应该表示为回款的 page&amp;amp;size: 分页参数，page从1开始递增  再来看下请求头参数，这里就有一大堆了：
+ Device-Mac: 猜测是手机硬件信息，但是应该可以随便传 Cookie：这个没什么可说的，原样复制就行 vendorId: 估计是表示手机类型，苹果或者安卓 ScreenRes: 不清楚 Channel: 不清楚，但不重要 Keys-Identity：看着很重要的一个值，但是固定不变，抄就行了 Authorization: 最担心的一个参数，不过居然也是固定不变，障碍扫清了 safeimei、idfa: 不清楚什么含义，但是值是一致的，也是固定不变的，抄  再来看下响应报文，看看怎么提取我要的数据：
+{ &amp;#34;d&amp;#34;: { &amp;#34;repayments&amp;#34;: [ { &amp;#34;dateDesc&amp;#34;: &amp;#34;2020年02月29日&amp;#34;, &amp;#34;items&amp;#34;: [ { &amp;#34;amount&amp;#34;: &amp;#34;0.01&amp;#34;, ... }, { &amp;#34;amount&amp;#34;: &amp;#34;0.01&amp;#34;, ... } }, { &amp;#34;dateDesc&amp;#34;: &amp;#34;2020年03月01日&amp;#34;, &amp;#34;items&amp;#34;: [ { &amp;#34;amount&amp;#34;: &amp;#34;0.</description>
+    </item>
+    
+  </channel>
+</rss>

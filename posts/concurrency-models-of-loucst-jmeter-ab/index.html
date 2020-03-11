@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>聊聊ab、wrk、JMeter、Locust这些压测工具的并发模型差别 // Jace&#39;s Blog</title>
+
+        <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+        <meta property="og:title" content="聊聊ab、wrk、JMeter、Locust这些压测工具的并发模型差别" />
+    <meta property="og:description" content="" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://blog.xuh.me/posts/concurrency-models-of-loucst-jmeter-ab/" />
+    
+
+    <link href="" rel="alternate" type="application/rss+xml" title="Jace&#39;s Blog" />
+    <link rel="shortcut icon" href="/favicon.png">
+
+    <link href="https://blog.xuh.me/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+    <link href="https://blog.xuh.me/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="https://blog.xuh.me/css/style.css">
+
+    <meta name="generator" content="Hugo 0.55.3" />
+</head>
+
+
+<body>
+<div id="container">
+    <header id="header">
+    <div id="header-outer" class="outer">
+        <div id="header-inner" class="inner">
+            <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+            <a id="logo" class="logo-text" href="https://blog.xuh.me/">Jace&#39;s Blog</a>
+            <nav id="main-nav">
+                
+                <a class="main-nav-link" href="/">Home</a>
+                
+                <a class="main-nav-link" href="/posts">Posts</a>
+                
+                <a class="main-nav-link" href="/tags">Tags</a>
+                
+            </nav>
+            <nav id="sub-nav">
+                <div id="search-form-wrap">
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+
+    <section id="main" class="outer">
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        <header class="article-header">
+            <h1 class="article-title" itemprop="name">聊聊ab、wrk、JMeter、Locust这些压测工具的并发模型差别</h1>
+        </header>
+        
+        <div class="article-meta">
+            <a href="/posts/concurrency-models-of-loucst-jmeter-ab/" class="article-date">
+                <time datetime='2020-03-04T22:42:22.000&#43;08:00' itemprop="datePublished">2020-03-04</time>
+            </a>
+            
+            
+            
+        </div>
+        <div class="article-entry" itemprop="articleBody">
+            
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200303173425.png" alt="压测选型" /></p>
+
+<h3 id="选择压测工具是在选什么">选择压测工具是在选什么？</h3>
+
+<p>压力测试是测试工程师日常工作中一项比较“有技术含量”的工作，很多人都对这项工作充满了好奇。除了少数特殊场景得靠是自己开发压测脚本外，大部分压测工作是可以选用成熟的压测工具来进行的。压测工具有非常多，有开源的、有商业化的，我下面罗列一些常见的：</p>
+
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>项目地址</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>ApacheBench</td>
+<td><a href="https://httpd.apache.org/docs/2.4/programs/ab.html">https://httpd.apache.org/docs/2.4/programs/ab.html</a></td>
+</tr>
+
+<tr>
+<td>wrk</td>
+<td><a href="https://github.com/wg/wrk">https://github.com/wg/wrk</a></td>
+</tr>
+
+<tr>
+<td>Apache JMeter</td>
+<td><a href="https://jmeter.apache.org/">https://jmeter.apache.org/</a></td>
+</tr>
+
+<tr>
+<td>Locust</td>
+<td><a href="https://locust.io/">https://locust.io/</a></td>
+</tr>
+
+<tr>
+<td>K6</td>
+<td><a href="https://k6.io/">https://k6.io/</a></td>
+</tr>
+
+<tr>
+<td>Artillery</td>
+<td><a href="https://artillery.io/">https://artillery.io/</a></td>
+</tr>
+</tbody>
+</table>
+
+<p>除了LoadRunner这种商业压测工具之外，大部分测试人员在压测工具的选型时最重要的一点：<strong>是否熟悉</strong>。这种<strong>熟悉</strong>往往是出于过往的工作经历、身边同事的推荐、网上教程的多寡、脚本语言等因素。比如我在很多年前开始用<code>Locust</code>时，就是因为我个人擅长<code>Python</code>开发语言，即便在当时几乎没有中文教程。</p>
+
+<p>但我在使用<code>Locust</code>一段时间之后，大约在2015年中，我意识到<code>Locust</code>作为一款压测工具，其能够产生的压力好像远远逊色于<code>JMeter</code>之类，于是开始关注压测工具背后的并发模型，去理解不同压测工具运行逻辑，尝试去解释我看到的性能差异。</p>
+
+<h3 id="同步-异步-阻塞-非阻塞">同步、异步、阻塞、非阻塞</h3>
+
+<p>要讲并发模型，我们绕不开以下四个名词：</p>
+
+<ul>
+<li>同步（Synchronous）</li>
+<li>异步（Asynchronous）</li>
+<li>阻塞 (Blocking)</li>
+<li>非阻塞（Nonblocking）</li>
+</ul>
+
+<p>而且我还要特地指出：<strong>目前你能通过搜索引擎找到的、能准确解释这四个概念的中文资料，是极少的。</strong></p>
+
+<p>我这边不会班门弄斧地来解释这四个词的差别，只是提一些大部分资料中忽视的点：</p>
+
+<ul>
+<li>要区分同步、异步，必须讲清楚其所处的层，比如框架、用户空间、内核、IO模型</li>
+<li><strong>同步</strong>调用发起后，没有得到结果不返回，那么毫无疑问就是<strong>被阻塞</strong>了</li>
+<li><strong>异步</strong>调用发起后直接返回，毫无疑问，这个进程没有<strong>被阻塞</strong></li>
+</ul>
+
+<p>在<strong>Operating System Concepts [9th Edition]</strong>该书中描述对进程间通信进行了一些描述</p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200304095711.png" alt="" /></p>
+
+<p>也就是说，站在进程通信纬度上来看，阻塞、非阻塞与同步、异步是同义词，但是需要区分发送方、接收方：</p>
+
+<ul>
+<li>阻塞发送</li>
+<li>非阻塞发送</li>
+<li>阻塞接受</li>
+<li>非阻塞接受</li>
+</ul>
+
+<p><strong>上述不同类型的发送方法和不同类型的接收方法可以自由组合</strong></p>
+
+<p>另外，我们还知道Linux有五种I/O模型：</p>
+
+<ol>
+<li>阻塞式IO（Blocking I/O）</li>
+<li>非阻塞式IO（Nonblocking I/O）</li>
+<li>IO复用（I/O multiplexing）
+
+<ul>
+<li>select</li>
+<li>poll</li>
+<li>epoll</li>
+</ul></li>
+<li>信号驱动式IO（Signal Driver I/O）</li>
+<li>异步IO（Asynchronous I/O）
+
+<ul>
+<li>AIO</li>
+</ul></li>
+</ol>
+
+<p><strong>以上1-4其实都是同步IO，只有第五种模型才是异步IO</strong></p>
+
+<p>了解以上这些概念后，我们再来讲讲文章标题中提到的这些压测工具背后的并发模型</p>
+
+<h3 id="基于多线程并发的ab-jmeter">基于多线程并发的ab、JMeter</h3>
+
+<p>ab、JMeter分别是用C、Java开发的、基于多线程并发模型的压测工具，也是目前最流行的开源压测工具，两者的工作原理类似，如下图：</p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200304141453.png" alt="多线程并发" /></p>
+
+<ul>
+<li>不管ab还是JMeter，其所谓的虚拟用户(vuser)就是对应一个线程</li>
+<li>在单个线程中，每个请求（query）都是同步调用的，下一个请求要等待前一个请求完成才能进行</li>
+<li>一个请求（query）分成三部分：
+
+<ul>
+<li>send - 施压端发送开始，直到承压端接收完成</li>
+<li>wait - 承压端接收完成开始，直至业务处理结束</li>
+<li>recv - 承压端返回数据，直至施压端接收完成</li>
+</ul></li>
+<li>同一线程中连续的两个请求之间存在<strong>等待时间</strong>这种概念，即图中的空白处</li>
+</ul>
+
+<p><strong>在多线程并发模型下，是不是可以通过不断增加线程数量生产出更大的压力？</strong></p>
+
+<p>答案是否定的。</p>
+
+<p>事实上一个进程在一个时间点只能执行一个线程，而所谓的<strong>并发</strong>是指在进程里不断切换线程实现了看上去的多个任务的<strong>并发</strong>，但是线程上下文切换有很高的成本，过多的线程数反而会造成性能的严重下滑。</p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200304173606.jpg" alt="BIO" /></p>
+
+<p>从应用角度来看，基于多线程的并发模型，往往需要设置<strong>最大并发数</strong>参数，而如果压测场景需要不断往上加压，那这类工具其实挺难应付的。</p>
+
+<h3 id="wrk为什么比ab快">wrk为什么比ab快？</h3>
+
+<p>wrk是一款很类似ab的压测工具，同样是使用C语言开发，不过更加的『现代化』：</p>
+
+<blockquote>
+<p>wrk is a modern HTTP benchmarking tool capable of generating significant load when run on a single multi-core CPU. It combines a multithreaded design with scalable event notification systems such as epoll and kqueue.</p>
+</blockquote>
+
+<p>我们通过wrk的执行参数来来解释其并发模型：</p>
+
+<ul>
+<li>connections: Connections to keep open</li>
+<li>threads: Number of threads to use</li>
+</ul>
+
+<p>wrk的<code>connections</code>接近ab的<code>concurrency</code>的概念，见：<a href="https://github.com/wg/wrk/issues/205">https://github.com/wg/wrk/issues/205</a></p>
+
+<p>但是在ab中，<code>concurrency</code>即线程数，而wrk却有单独的<code>threads</code>参数。</p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200304151517.png" alt="wrk concurrency model" /></p>
+
+<p>wrk为了提升吞吐能力，使用基于epoll的IO复用模型，可以参考下图（图中实际为select），<strong>同时为了减少线程的上下文切换，官方建议thread的数量等同CPU核数</strong>，即每一个processor下只运行一个线程，这样来彻底了摆脱了线程切换的消耗。</p>
+
+<p>注意了，在这种模型下，施压端发起请求是阻塞的，它需要等待多个请求一起发送，但是在接收时却是非阻塞的。</p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200304162724.jpg" alt="" /></p>
+
+<p><strong>基于这种并发模型的wrk一定会比ab、jmeter这类强吗？</strong></p>
+
+<p>答案是不一定。I/O复用不是银弹，它并不一定适用所有的压测场景。外网有wrk、jmeter的对比测试，可以看下这两种压测更适合哪些场景：</p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200304174836.png" alt="" /></p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200304174851.png" alt="" /></p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200304174912.png" alt="" /></p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200304174929.png" alt="" /></p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200304174942.png" alt="" /></p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200304175024.png" alt="" /></p>
+
+<p>wrk没有比JMeter更流行的原因可能是缺少GUI，同时起脚本使用<code>lua</code>语言，又比较小众。</p>
+
+<h3 id="locust-artillery身后的libuv">Locust、Artillery身后的libuv</h3>
+
+<p>Locust是用Python开发的分布式压测工具，近年来在国内比较流行。Locust并不是基于Python的多线程，而是coroutine（协程，gevent提供），gevent使用了<code>libev</code>或者<code>libuv</code>作为eventloop。</p>
+
+<p>所谓的evetloop（事件循环）可以看下面这张图来加深理解：</p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200304180440.png" alt="eventloop" /></p>
+
+<p>这里介绍另外个压测工具Artillery，熟悉的人应该比较少，它是基于Node.js开发的。</p>
+
+<p>这里为什么把它跟Locust归到一起来介绍？了解Node.js的人想必已经知道原因了：底层的<code>libuv</code>提供了极强悍的异步IO能力。</p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200304181500.png" alt="img" /></p>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200304180531.png" alt="libuv" /></p>
+
+<p>其事件循环逻辑：</p>
+
+<p><img src="http://docs.libuv.org/en/v1.x/_images/loop_iteration.png" alt="eventloop" /></p>
+
+<p>想深入了解libuv可以参考官方文档，这里不多展开了：<a href="http://docs.libuv.org/en/v1.x/design.html">http://docs.libuv.org/en/v1.x/design.html</a></p>
+
+<p><strong>不过就我实在使用经验来看，Locust所能产生的并发匪夷所思的低，该问题有很多人向官方反馈过（包括我自己），我不确定到目前版本该问题是否已经根除。在你不确定的情况下，请谨慎使用Locust，包括其分布式执行模式。</strong></p>
+
+<h3 id="横向比较这些压测工具">横向比较这些压测工具</h3>
+
+<p>在我写这篇文章搜索资料之时，意外发现<code>k6.io</code>的blog上有目前已知压测工具的综合对比，非常完善，可以直接戳这里：<a href="https://k6.io/blog/comparing-best-open-source-load-testing-tools">https://k6.io/blog/comparing-best-open-source-load-testing-tools</a></p>
+
+<p>对于这些开源的压测工具，我的观点：</p>
+
+<ul>
+<li>JMeter能够应付大部分压测场景，即便多线程并发模型不是最高效的</li>
+<li>如果你的压测场景中，需要不断往上加压，请尝试基于异步API的压测工具，多线程并发满足不了需求</li>
+<li>如果你不满足以上工具，请接着往下看</li>
+</ul>
+
+<h3 id="one-more-thing-ultron">one more thing - Ultron</h3>
+
+<p>除上面介绍的这些并发模型之外，我相信很多人听过Golang下的goroutine：</p>
+
+<ul>
+<li>goroutine可以理解是用户态线程，goroutine的切换没有内核开销</li>
+<li>内存占用小，线程栈空间通常是 2M，goroutine 栈空间最小 2K</li>
+<li>G-M-P调度模型</li>
+</ul>
+
+<p>golang为并发而生，go项目在未经优化的情况下就有很高的并发能力，有人曾经调侃，十年经验的cpp程序员用各种黑魔法写出来的服务也未必有golang项目的高并发能力。（ 一个段子而已，不要太当真）</p>
+
+<p>那goroutine这么强，那有没有基于goroutine的开源压测工具？</p>
+
+<p><strong>开始带货了</strong></p>
+
+<p>我这里推荐下ultron这个项目: <a href="https://github.com/qastub/ultron">https://github.com/qastub/ultron</a></p>
+
+<ul>
+<li>基于goroutine的高并发能力，在与wrk、jmeter等工具的对比测试中，并发能力超出jmeter，仅次于wrk</li>
+<li>goroutine提供的是同步函数的语义，理解简单</li>
+<li>对请求（或事务）进行了高度抽象，方便接入各种协议</li>
+<li>提供了Result、Report事件监听接口，方便扩展，如内置了对Influxdb的支持，可以实时生成报告</li>
+</ul>
+
+<hr />
+
+<p><strong>参考资料：</strong></p>
+
+<ul>
+<li><a href="https://www.zhihu.com/question/19732473/answer/241673170">怎样理解阻塞非阻塞与同步异步的区别？</a></li>
+<li><a href="https://medium.com/@malith.jayasinghe/jmeter-vs-wrk-9b8d307ecdff">JMeter VS WRK</a></li>
+<li><a href="https://k6.io/blog/comparing-best-open-source-load-testing-tools">Comparing the best open source load testing tools since 2017!</a></li>
+</ul>
+
+<p><img src="https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200310102547.png" alt="" /></p>
+
+        </div>
+
+        
+        
+        <div class="article-toc" style="display:none;">
+            <h3>Contents</h3>
+            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#选择压测工具是在选什么">选择压测工具是在选什么？</a></li>
+<li><a href="#同步-异步-阻塞-非阻塞">同步、异步、阻塞、非阻塞</a></li>
+<li><a href="#基于多线程并发的ab-jmeter">基于多线程并发的ab、JMeter</a></li>
+<li><a href="#wrk为什么比ab快">wrk为什么比ab快？</a></li>
+<li><a href="#locust-artillery身后的libuv">Locust、Artillery身后的libuv</a></li>
+<li><a href="#横向比较这些压测工具">横向比较这些压测工具</a></li>
+<li><a href="#one-more-thing-ultron">one more thing - Ultron</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+        </div>
+        
+        
+
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.slim.min.js" integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc=" crossorigin="anonymous"></script>
+        <script>
+            (function() {
+                var $toc = $('#TableOfContents');
+                if ($toc.length > 0) {
+                    var $window = $(window);
+
+                    function onScroll(){
+                        var currentScroll = $window.scrollTop();
+                        var h = $('.article-entry h1, .article-entry h2, .article-entry h3, .article-entry h4, .article-entry h5, .article-entry h6');
+                        var id = "";
+                        h.each(function (i, e) {
+                            e = $(e);
+                            if (e.offset().top - 10 <= currentScroll) {
+                                id = e.attr('id');
+                            }
+                        });
+                        var active = $toc.find('a.active');
+                        if (active.length == 1 && active.eq(0).attr('href') == '#' + id) return true;
+
+                        active.each(function (i, e) {
+                            $(e).removeClass('active').siblings('ul').hide();
+                        });
+                        $toc.find('a[href="#' + id + '"]').parentsUntil('#TableOfContents').each(function (i, e) {
+                            $(e).children('a').addClass('active').siblings('ul').show();
+                        });
+                    }
+
+                    $window.on('scroll', onScroll);
+                    $(document).ready(function() {
+                        $toc.find('a').parent('li').find('ul').hide();
+                        onScroll();
+                        document.getElementsByClassName('article-toc')[0].style.display = '';
+                    });
+                }
+            })();
+        </script>
+        
+
+        
+        <footer class="article-footer">
+            <ul class="article-tag-list">
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://blog.xuh.me//tags/%E5%8E%8B%E6%B5%8B%E5%B7%A5%E5%85%B7">压测工具
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://blog.xuh.me//tags/%E6%80%A7%E8%83%BD%E5%B7%A5%E7%A8%8B">性能工程
+                    </a>
+                </li>
+                
+            </ul>
+        </footer>
+        
+        <nav id="article-nav">
+    
+    <a href="/posts/the-reasons-why-automated-testing-did-not-meet-expectations/" id="article-nav-newer" class="article-nav-link-wrap">
+        <div class="article-nav-title"><span>&lt;</span>&nbsp;
+            为什么我们做不好自动化测试？
+        </div>
+    </a>
+    
+    
+    <a href="/posts/invoke-api-from-mitm-attack/" id="article-nav-older" class="article-nav-link-wrap">
+        <div class="article-nav-title">P2P平台暴雷后，该怎么确认自己的待回款资金？&nbsp;<span>&gt;</span></div>
+    </a>
+    
+</nav>
+
+
+        
+        <script src="https://utteranc.es/client.js"
+            repo="jacexh/comments"
+            issue-term="pathname"
+            label="blog"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+        </script>
+        
+    </div>
+</article>
+
+        
+    </section>
+    <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2020 jacexh
+            <br />
+            Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> with theme <a href="https://github.com/carsonip/hugo-theme-minos" target="_blank">Minos</a>
+        </div>
+    </div>
+    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/atom-one-dark.min.css" integrity="sha256-GA29iW/iYj9FcuQQktvW45pRzHvZeFfgeFvA4tGVjpM=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js" integrity="sha256-aYTdUrn6Ow1DDgh5JTc3aDGnnju48y/1c8s1dgkYPQ8=" crossorigin="anonymous"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    
+    <script>
+        document.getElementById('main-nav-toggle').addEventListener('click', function () {
+            var header = document.getElementById('header');
+            if (header.classList.contains('mobile-on')) {
+                header.classList.remove('mobile-on');
+            } else {
+                header.classList.add('mobile-on');
+            }
+        });
+    </script>
+</footer>
+
+</div>
+</body>
+</html>
