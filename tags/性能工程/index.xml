@@ -20,16 +20,54 @@
       <pubDate>Wed, 04 Mar 2020 22:42:22 +0800</pubDate>
       <author>jace.xh@gmail.com (jacexh)</author>
       <guid>https://blog.xuh.me/posts/concurrency-models-of-loucst-jmeter-ab/</guid>
-      <description>选择压测工具是在选什么？ 压力测试是测试工程师日常工作中一项比较“有技术含量”的工作，很多人都对这项工作充满了好奇。除了少数特殊场景得靠是自己开发压测脚本外，大部分压测工作是可以选用成熟的压测工具来进行的。压测工具有非常多，有开源的、有商业化的，我下面罗列一些常见的：
-   工具 项目地址     ApacheBench https://httpd.apache.org/docs/2.4/programs/ab.html   wrk https://github.com/wg/wrk   Apache JMeter https://jmeter.apache.org/   Locust https://locust.io/   K6 https://k6.io/   Artillery https://artillery.io/    除了LoadRunner这种商业压测工具之外，大部分测试人员在压测工具的选型时最重要的一点：是否熟悉。这种熟悉往往是出于过往的工作经历、身边同事的推荐、网上教程的多寡、脚本语言等因素。比如我在很多年前开始用Locust时，就是因为我个人擅长Python开发语言，即便在当时几乎没有中文教程。
-但我在使用Locust一段时间之后，大约在2015年中，我意识到Locust作为一款压测工具，其能够产生的压力好像远远逊色于JMeter之类，于是开始关注压测工具背后的并发模型，去理解不同压测工具运行逻辑，尝试去解释我看到的性能差异。
-同步、异步、阻塞、非阻塞 要讲并发模型，我们绕不开以下四个名词：
- 同步（Synchronous） 异步（Asynchronous） 阻塞 (Blocking) 非阻塞（Nonblocking）  而且我还要特地指出：目前你能通过搜索引擎找到的、能准确解释这四个概念的中文资料，是极少的。
-我这边不会班门弄斧地来解释这四个词的差别，只是提一些大部分资料中忽视的点：
- 要区分同步、异步，必须讲清楚其所处的层，比如框架、用户空间、内核、IO模型 同步调用发起后，没有得到结果不返回，那么毫无疑问就是被阻塞了 异步调用发起后直接返回，毫无疑问，这个进程没有被阻塞  在Operating System Concepts [9th Edition]该书中描述对进程间通信进行了一些描述
-也就是说，站在进程通信纬度上来看，阻塞、非阻塞与同步、异步是同义词，但是需要区分发送方、接收方：
- 阻塞发送 非阻塞发送 阻塞接受 非阻塞接受  上述不同类型的发送方法和不同类型的接收方法可以自由组合
-另外，我们还知道Linux有五种I/O模型：</description>
+      <description>&lt;p&gt;&lt;img src=&#34;https://my-storage.oss-cn-shanghai.aliyuncs.com/picgo/20200303173425.png&#34; alt=&#34;压测选型&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;选择压测工具是在选什么&#34;&gt;选择压测工具是在选什么？&lt;/h3&gt;
+
+&lt;p&gt;压力测试是测试工程师日常工作中一项比较“有技术含量”的工作，很多人都对这项工作充满了好奇。除了少数特殊场景得靠是自己开发压测脚本外，大部分压测工作是可以选用成熟的压测工具来进行的。压测工具有非常多，有开源的、有商业化的，我下面罗列一些常见的：&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;工具&lt;/th&gt;
+&lt;th&gt;项目地址&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;ApacheBench&lt;/td&gt;
+&lt;td&gt;&lt;a href=&#34;https://httpd.apache.org/docs/2.4/programs/ab.html&#34;&gt;https://httpd.apache.org/docs/2.4/programs/ab.html&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;wrk&lt;/td&gt;
+&lt;td&gt;&lt;a href=&#34;https://github.com/wg/wrk&#34;&gt;https://github.com/wg/wrk&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;Apache JMeter&lt;/td&gt;
+&lt;td&gt;&lt;a href=&#34;https://jmeter.apache.org/&#34;&gt;https://jmeter.apache.org/&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;Locust&lt;/td&gt;
+&lt;td&gt;&lt;a href=&#34;https://locust.io/&#34;&gt;https://locust.io/&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;K6&lt;/td&gt;
+&lt;td&gt;&lt;a href=&#34;https://k6.io/&#34;&gt;https://k6.io/&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;Artillery&lt;/td&gt;
+&lt;td&gt;&lt;a href=&#34;https://artillery.io/&#34;&gt;https://artillery.io/&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;除了LoadRunner这种商业压测工具之外，大部分测试人员在压测工具的选型时最重要的一点：&lt;strong&gt;是否熟悉&lt;/strong&gt;。这种&lt;strong&gt;熟悉&lt;/strong&gt;往往是出于过往的工作经历、身边同事的推荐、网上教程的多寡、脚本语言等因素。比如我在很多年前开始用&lt;code&gt;Locust&lt;/code&gt;时，就是因为我个人擅长&lt;code&gt;Python&lt;/code&gt;开发语言，即便在当时几乎没有中文教程。&lt;/p&gt;</description>
     </item>
     
   </channel>
